@@ -26,10 +26,10 @@ impl Scene for Payoff {
         let press = press.clamp(0.0, 1.0);
         let result_op = ramp(&frame, 4.3);
         // The window recedes, then the letter takes the page.
-        let recede = seg(&frame, 8.0, 1.4);
+        let recede = seg(&frame, 7.8, 1.4);
         let window_op = 1.0 - recede;
         let drift = recede * 26.0;
-        let a_op = ramp(&frame, 9.6);
+        let a_op = ramp(&frame, 9.1);
 
         fframes::svgr!(
         <g>

@@ -21,7 +21,7 @@ impl Scene for Roles {
         let mut out: Vec<Svgr> = Vec::new();
         for (i, (role, call)) in ROLES.iter().enumerate() {
             let at = i as f32 * 4.0;
-            let op = in_out(&frame, at, 3.1, 0.45);
+            let op = in_out(&frame, at, 3.6, 0.45);
             if op <= 0.01 {
                 continue;
             }
