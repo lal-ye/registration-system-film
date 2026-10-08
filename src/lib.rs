@@ -61,9 +61,11 @@ impl Video for RegistrationSystemFilmVideo<'_> {
         Duration::Auto
     }
 
+    // bed.mp3 is already loudness-normalised to -16 LUFS with a 2 s fade in, so no gain is
+    // applied here: the template's gain_db(-16) would attenuate it a second time.
     fn audio(&self) -> AudioMap<'_> {
         AudioMap::from([
-            AudioTrack::new("bed.mp3", Second(0.0)..Eof).gain_db(-16.0).fade_out(4.0),
+            AudioTrack::new("bed.mp3", Second(0.0)..Eof).fade_out(4.0),
         ])
     }
 
