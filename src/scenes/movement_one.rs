@@ -1,0 +1,83 @@
+//! 50-64s. Movement I: a fact lives in exactly one place. A rule lives in the class; a field
+//! lives in the base class. Each proof is ~4 s, the landing ~3 s.
+use crate::design::*;
+use fframes::{Duration, FFramesContext, Frame, Scene, Svgr};
+
+const GUARD: [&str; 5] = [
+    "public void setGender(String gender) {",
+    "    if (gender == null || (!gender.equals(\"M\") && !gender.equals(\"F\"))) {",
+    "        throw new IllegalArgumentException(\"Gender must be 'M' or 'F'.\");",
+    "    }",
+    "    this.gender = gender;",
+];
+
+#[derive(Debug)]
+pub struct MovementOne;
+
+impl Scene for MovementOne {
+    fn duration(&self) -> Duration<'_> {
+        Duration::Seconds(14.0)
+    }
+
+    fn render_frame<'a>(&'a self, frame: Frame, _ctx: &FFramesContext<'a, '_>) -> Svgr<'a> {
+        let mut out: Vec<Svgr> = Vec::new();
+
+        // 0-3s: the thesis, alone on paper.
+        let thesis_op = in_out(&frame, 0.15, 2.2, 0.55);
+        if thesis_op > 0.01 {
+            out.push(fframes::svgr!(<g opacity={thesis_op}>
+                {statement("one fact, one place.", STATEMENT, 192.0, 540.0, 1.0, INK)}
+            </g>));
+        }
+
+        // 3-7s: proof. A rule that cannot be stepped over, from inside the class.
+        let guard_op = in_out(&frame, 3.1, 3.2, 0.6);
+        if guard_op > 0.01 {
+            let mut lines: Vec<Svgr> = Vec::new();
+            for (i, line) in GUARD.iter().enumerate() {
+                let op = ramp(&frame, 3.2 + i as f32 * 0.14) * guard_op;
+                let is_throw = i == 2;
+                lines.push(fframes::svgr!(<text x={196.0 + i as f32 * 18.0} y={430.0 + i as f32 * 44.0}
+                    font-family={MONO_F} font-weight={MONO_W} font-size={MONO_MD}
+                    fill={if is_throw { RUST } else { INK }} opacity={op}>{line}</text>));
+            }
+            out.push(fframes::svgr!(<g>
+                {lines}
+                {rule(250.0, 452.0, 700.0 * ramp(&frame, 3.6), ramp(&frame, 3.6) * guard_op)}
+                {mono("Model/User.java", MONO_XS, 196.0, 690.0, ramp(&frame, 3.5) * guard_op, "#6d675d")}
+            </g>));
+        }
+
+        // 7-11s: proof. Inheritance made visible as absence: two nearly empty boxes.
+        let boxes_op = in_out(&frame, 7.1, 3.2, 0.6);
+        if boxes_op > 0.01 {
+            let links: Vec<Svgr> = vec![
+                fframes::svgr!(<rect x="899" y="432" width="2" height="34" fill="#c9c5bc" />),
+                fframes::svgr!(<rect x="318" y="465" width="990" height="2" fill="#c9c5bc" />),
+                fframes::svgr!(<rect x="317" y="465" width="2" height="27" fill="#c9c5bc" />),
+                fframes::svgr!(<rect x="1307" y="465" width="2" height="27" fill="#c9c5bc" />),
+            ];
+            out.push(fframes::svgr!(<g opacity={boxes_op}>
+                <rect x="480" y="262" width="960" height="170" rx="8" fill={CARD} opacity="0.75" />
+                {mono("User", MONO_LG, 512.0, 312.0, 1.0, INK)}
+                {sans("abstract class", UI, 640.0, 310.0, 1.0, "#8a8479")}
+                {mono("id · firstName · lastName · gender · dob · password", MONO_MD, 512.0, 372.0, 1.0, INK)}
+                {links}
+                <rect x="280" y="492" width="580" height="150" rx="8" fill={CARD} opacity="0.75" />
+                {mono("Student", MONO_LG, 312.0, 542.0, 1.0, INK)}
+                {mono("+ sectionId", MONO_MD, 312.0, 604.0, ramp(&frame, 7.9), RUST)}
+                <rect x="1060" y="492" width="580" height="150" rx="8" fill={CARD} opacity="0.75" />
+                {mono("Instructor", MONO_LG, 1092.0, 542.0, 1.0, INK)}
+                {mono("+ deptId, boolean isHoD", MONO_MD, 1092.0, 604.0, ramp(&frame, 8.2), RUST)}
+                {mono("extends User — and declares almost nothing", MONO_XS, 960.0, 700.0, ramp(&frame, 8.5), "#6d675d")}
+            </g>));
+        }
+
+        // 11-14s: the landing.
+        let landing_op = ramp(&frame, 11.1);
+        out.push(fframes::svgr!(<g opacity={landing_op} transform={Transform::translate(0.0, rise(&frame, 11.1, 26.0))}>
+            {statement("illegal states don't exist.", STATEMENT, 192.0, 540.0, 1.0, INK)}
+        </g>));
+        fframes::svgr!(<g>{out}</g>)
+    }
+}

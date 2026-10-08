@@ -1,0 +1,174 @@
+name: Render video
+
+# Renders this fframes project on a free GitHub runner and uploads the mp4 plus
+# review PNGs. Rendering happens here rather than locally because a full build
+# (including a static ffmpeg) needs gigabytes of disk.
+#
+# The binary name is discovered from Cargo.toml rather than hardcoded, so this
+# file works unchanged in any fframes project.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      draft:
+        description: Draft render only (one scene, half resolution, fast preset)
+        type: boolean
+        default: false
+      skip_render:
+        description: Review PNGs only (skip the mp4 encode)
+        type: boolean
+        default: false
+
+# Least privilege: this workflow only reads the repo and uploads artifacts.
+permissions:
+  contents: read
+
+# A render is minutes of CPU; never run two for the same ref at once.
+concurrency:
+  group: render-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+  CARGO_INCREMENTAL: "0"
+  RUST_BACKTRACE: "1"
+  # ffmpeg-sys-fframes downloads a prebuilt static FFmpeg for Linux x86_64, but
+  # that archive links x264/x265 dynamically and records the -L paths of the
+  # machine that built it. Those paths do not exist on a runner, so build.rs
+  # falls back to pkg-config and picks up the runner's system x264 -- which is
+  # a different ABI than the prebuilt's libavcodec was compiled against
+  # (prebuilt wants x264_encoder_open_163, Ubuntu 24.04 ships 164), and the
+  # final link fails with "undefined symbol: x264_encoder_open_163".
+  # Building FFmpeg from source makes x264 come from the same bundled sources
+  # as libavcodec, so the pair always matches whatever the runner is.
+  FFMPEG_FORCE_BUILD: "1"
+  # A source build otherwise gets -march=native, and rust-cache would then
+  # restore artifacts built on a different runner's CPU, which can SIGILL.
+  # Pin a portable baseline instead.
+  FFMPEG_MARCH: "x86-64"
+  FFMPEG_MTUNE: "generic"
+
+jobs:
+  render:
+    # Free for public repositories. The CPU backend needs no GPU, so a plain
+    # runner is all this requires.
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      # FFmpeg is compiled from source here (see the FFMPEG_* env vars), which
+      # is why the assemblers and dev headers are needed.
+      #
+      # libx264-dev is REQUIRED even though the prebuilt static ffmpeg is not
+      # used: the `h264` feature makes ffmpeg-sys-fframes pass
+      # --enable-libx264 to ./configure, and configure aborts with
+      # "ERROR: x264 not found using pkg-config" without it. x264 always comes
+      # from the system (ffmpeg-sys-fframes never vendors it); what
+      # FFMPEG_FORCE_BUILD buys is that libavcodec.a is then compiled against
+      # the *same* x264 the final link resolves, which is the whole point --
+      # the prebuilt archive was built against x264 163 while Ubuntu noble ships
+      # 164, producing `undefined symbol: x264_encoder_open_163`.
+      - name: Install system dependencies
+        run: |
+          set -euo pipefail
+          export DEBIAN_FRONTEND=noninteractive
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends \
+            yasm nasm \
+            clang libclang-dev \
+            ninja-build \
+            libx264-dev \
+            pkg-config
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@89b12181fb390509a0842a86cc55eeb8eb928c1d # stable
+
+      # Without this every push is a cold build, and the cold build is where the
+      # static ffmpeg lands.
+      - name: Cache cargo build
+        uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
+        with:
+          workspaces: ". -> target"
+          key: ${{ github.job }}
+          shared-key: fframes-render
+
+      # Read the binary name from the manifest so the rest of the workflow is
+      # project-agnostic. CARGO_PKG_NAME and the default bin target agree for the
+      # single-binary projects cargo fframes new generates.
+      - name: Resolve binary name
+        id: bin
+        run: |
+          set -euo pipefail
+          NAME="$(awk -F'"' '/^\[package\]/{f=1} f && /^name[[:space:]]*=/{print $2; exit}' Cargo.toml)"
+          if [ -z "${NAME}" ]; then
+            echo "::error::no [package] name in Cargo.toml"
+            exit 1
+          fi
+          echo "name=${NAME}" >> "${GITHUB_OUTPUT}"
+          echo "Using binary: ${NAME}"
+
+      - name: Build
+        run: cargo build --release --locked
+
+      - name: Timeline
+        run: "./target/release/${{ steps.bin.outputs.name }} timeline"
+
+      # inspect reports missing media or fonts, text clipped by the canvas,
+      # invalid SVG and panics, and exits 2 when it finds any of them.
+      - name: Inspect every frame
+        run: "./target/release/${{ steps.bin.outputs.name }} inspect"
+
+      # A contact sheet is the cheapest way to see whether the motion works
+      # without watching the video. `strip` defaults to strip.png, `frame` to
+      # frames/; collect them under review/ so one artifact holds them all.
+      - name: Contact sheet
+        run: "./target/release/${{ steps.bin.outputs.name }} strip -n 12"
+
+      # Full-size stills at the moments that matter.
+      - name: Still frames
+        run: "./target/release/${{ steps.bin.outputs.name }} frame 1s,50%,end"
+
+      - name: Collect review images
+        run: |
+          set -euo pipefail
+          mkdir -p review
+          for f in strip.png frames onion.png; do
+            if [ -e "${f}" ]; then
+              mkdir -p "review/$(dirname "${f}")"
+              mv "${f}" "review/${f}"
+            fi
+          done
+          find review -type f | sort
+
+      - name: Upload review images
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: review-images
+          path: review/
+          retention-days: 14
+          if-no-files-found: error
+
+      # A full render of every scene at 1080p.
+      - name: Render
+        if: ${{ !inputs.draft && !inputs.skip_render }}
+        run: "./target/release/${{ steps.bin.outputs.name }} render"
+
+      # One scene at half resolution with the fast preset: seconds, not minutes.
+      # Proves the encoder and the file writer work end to end.
+      - name: Draft render
+        if: ${{ inputs.draft && !inputs.skip_render }}
+        run: "./target/release/${{ steps.bin.outputs.name }} render --draft"
+
+      - name: Upload video
+        if: ${{ !inputs.skip_render }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: video
+          path: out.mp4
+          retention-days: 14
+          if-no-files-found: error
