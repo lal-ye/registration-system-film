@@ -39,6 +39,9 @@ impl Scene for Architecture {
     }
 
     fn render_frame<'a>(&'a self, frame: Frame, _ctx: &FFramesContext<'a, '_>) -> Svgr<'a> {
+        // One hop per 2 s. `step` is the index of the hop in progress, so the band highlight
+        // and the dot are always reading the same clock.
+        let step = ((frame.seconds() - 0.6) / 2.0).floor().max(0.0);
         let mut out: Vec<Svgr> = Vec::new();
         for (i, band) in BANDS.iter().enumerate() {
             let flash = (1.0 - ((i as f32 - step) * 1.6).abs().min(1.0)) * 0.09;
@@ -62,8 +65,6 @@ impl Scene for Architecture {
             </g>
         ));
 
-        // The dot: one hop per 2 s, easing between the previous and the current position.
-        let step = ((frame.seconds() - 0.6) / 2.0).floor().max(0.0);
         let idx = (step as usize).min(HOPS.len() - 1);
         let eased = seg(&frame, 0.6 + step * 2.0, 1.5);
         let (cx, cy, label) = HOPS[idx];

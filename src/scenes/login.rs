@@ -42,21 +42,21 @@ impl Scene for Login {
         let mut lines: Vec<Svgr> = Vec::new();
         for (i, (code, tag, fill, dim)) in strip.iter().enumerate() {
             let at = 5.9 + i as f32 * 0.18;
-            let op = ramp(&frame, at) * dim as f32;
+            let op = ramp(&frame, at) * *dim as f32;
             lines.push(fframes::svgr!(<g opacity={op}>
                 <text x="470" y={812.0 + i as f32 * 46.0} font-family={MONO_F} font-weight={MONO_W}
-                      font-size={MONO_MD} fill={*fill}>{code}</text>
+                      font-size={MONO_MD} fill={*fill}>{*code}</text>
                 <text x="1450" y={812.0 + i as f32 * 46.0} font-family={MONO_F} font-weight={MONO_W}
-                      font-size={MONO_XS} fill={*fill}>{tag}</text>
+                      font-size={MONO_XS} fill={*fill}>{*tag}</text>
             </g>));
         }
 
         fframes::svgr!(<g>
             <g opacity={login_op} transform={Transform::translate(0.0, rise(&frame, 0.0, 40.0) * login_op)}>
-                {login_window(&frame, (id, pw), caret(&frame, 0.5, 5.0, ID), caret(&frame, 1.8, 7.0, MASK), press)}
+                {login_window((id, pw), caret(&frame, 0.5, 5.0, ID), caret(&frame, 1.8, 7.0, MASK), press)}
             </g>
             <g opacity={dash_op} transform={Transform::translate(0.0, rise(&frame, 3.8, 46.0) * (1.0 - dash_op))}>
-                {student_dashboard(&enrolled, 0.35 + 0.3 * (frame.seconds() * 0.7).sin())}
+                {student_dashboard(enrolled, 0.35 + 0.3 * (frame.seconds() * 0.7).sin())}
             </g>
             <rect x="440" y="762" width="1040" height="1" fill="#ddd9d0" opacity={ramp(&frame, 5.6)} />
             {lines}

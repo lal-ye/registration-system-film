@@ -2,9 +2,12 @@
 //! palette and the type scale from eroding one file at a time.
 use crate::grain::{BLOTCH, SPECKS};
 use fframes::{
-    AnimateRuntimeInput, Frame, Svgr, Transform, animation::{AnimationRuntime, Easing},
+    AnimateRuntimeInput, Frame, Svgr, animation::{AnimationRuntime, Easing},
 };
 use std::sync::LazyLock;
+
+/// Re-exported so every scene gets it from `design::*` rather than importing fframes itself.
+pub use fframes::Transform;
 
 pub const WIDTH: usize = 1920;
 pub const HEIGHT: usize = 1080;

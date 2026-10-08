@@ -27,9 +27,9 @@ impl Scene for Credits {
             let y = 646.0 + i as f32 * 40.0;
             names.push(fframes::svgr!(<g opacity={op}>
                 <text x="800" y={y} text-anchor="end" font-family={SANS} font-weight={SANS_W}
-                      font-size="21" fill={INK}>{name}</text>
+                      font-size="21" fill={INK}>{*name}</text>
                 <text x="828" y={y} font-family={MONO_F} font-weight={MONO_W} font-size="17"
-                      fill="#8a8479">{id}</text>
+                      fill="#8a8479">{*id}</text>
             </g>));
         }
         fframes::svgr!(<g>

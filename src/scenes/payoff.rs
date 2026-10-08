@@ -34,8 +34,9 @@ impl Scene for Payoff {
         fframes::svgr!(
         <g>
             <g opacity={window_op} transform={Transform::translate(0.0, drift)}>
-                {grade_entry("CS101 — Introduction to Programming", "1001 · Abebe Kebede", scores,
-                             caret(&frame, 2.6, 6.0, "48"), RESULT, result_op, press)}
+                {grade_entry("CS101 — Introduction to Programming".to_string(),
+                             "1001 · Abebe Kebede".to_string(), scores,
+                             caret(&frame, 2.6, 6.0, "48"), RESULT.to_string(), result_op, press)}
             </g>
             {letter(a_op, INK)}
         </g>)

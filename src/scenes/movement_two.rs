@@ -56,7 +56,7 @@ impl Scene for MovementTwo {
             for (i, pair) in PAIRS.iter().enumerate() {
                 let op = ramp(&frame, 3.25 + i as f32 * 0.42) * pairs_op;
                 rows.push(fframes::svgr!(<text x="300" y={300.0 + i as f32 * 66.0} font-family={MONO_F}
-                    font-weight={MONO_W} font-size={MONO_MD} fill={INK} opacity={op}>{pair}</text>));
+                    font-weight={MONO_W} font-size={MONO_MD} fill={INK} opacity={op}>{*pair}</text>));
             }
             out.push(fframes::svgr!(<g>
                 {rows}

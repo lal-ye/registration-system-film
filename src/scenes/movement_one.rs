@@ -39,7 +39,7 @@ impl Scene for MovementOne {
                 let is_throw = i == 2;
                 lines.push(fframes::svgr!(<text x={196.0 + i as f32 * 18.0} y={430.0 + i as f32 * 44.0}
                     font-family={MONO_F} font-weight={MONO_W} font-size={MONO_MD}
-                    fill={if is_throw { RUST } else { INK }} opacity={op}>{line}</text>));
+                    fill={if is_throw { RUST } else { INK }} opacity={op}>{*line}</text>));
             }
             out.push(fframes::svgr!(<g>
                 {lines}
