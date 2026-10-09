@@ -72,20 +72,27 @@ pub fn scrub(frame: &Frame, start: f32) -> f32 {
 
 /// 0 to 1 at a constant rate across an `over`-second window starting at `start`. Used for a
 /// multi-second move where the shared 1 s runtimes would be the wrong length.
+///
+/// Computed from the clock rather than from `scrub`, because `scrub` saturates at 1.0 after
+/// its runtime's own 1 s and would silently stop short on any window longer than that.
 pub fn seg(frame: &Frame, start: f32, over: f32) -> f32 {
-    (scrub(frame, start) / over.max(0.001)).clamp(0.0, 1.0)
+    ((frame.seconds() - start) / over.max(0.001)).clamp(0.0, 1.0)
 }
 
 /// 0 -> 1 across `over` seconds, arriving slowly. Anything that travels between
 /// two points and then stops should decelerate into place; at constant speed it
 /// reads as a machine, and the stop is what makes it read as an arrival.
+///
+/// The shared runtimes are exactly 1 s and saturate, so for a longer window the
+/// ramp is started early instead of being divided down: the shape is kept and the
+/// arrival still lands on `start + over`.
 pub fn decel(frame: &Frame, start: f32, over: f32) -> f32 {
-    (frame.animate_runtime(AnimateRuntimeInput {
-        on_second: start,
+    frame.animate_runtime(AnimateRuntimeInput {
+        on_second: start + (over - 1.0).max(0.0),
         from: 0.0,
         to: 1.0,
         animation_runtime: &DECEL,
-    }) / over.max(0.001)).clamp(0.0, 1.0)
+    })
 }
 
 /// Vertical offset that springs from `from` to 0 at `start`.

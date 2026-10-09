@@ -22,7 +22,7 @@ impl Scene for Credits {
 
     fn render_frame<'a>(&'a self, frame: Frame, _ctx: &FFramesContext<'a, '_>) -> Svgr<'a> {
         // The film ends by going quiet rather than by cutting: everything holds, then fades.
-        let fade = 1.0 - ramp(&frame, 4.1);
+        let fade = 1.0 - seg(&frame, 4.4, 0.6);
         let mut names: Vec<Svgr> = Vec::new();
         for (i, (name, id)) in TEAM.iter().enumerate() {
             let op = ramp(&frame, 0.5 + i as f32 * 0.22);

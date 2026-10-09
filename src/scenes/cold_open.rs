@@ -21,8 +21,9 @@ impl Scene for ColdOpen {
     }
 
     fn render_frame<'a>(&'a self, frame: Frame, _ctx: &FFramesContext<'a, '_>) -> Svgr<'a> {
-        // The figure fades up quickly and is otherwise motionless: an empty frame is the point.
-        let num_op = in_out(&frame, 0.15, HANDOFF - 0.15, 0.8);
+        // The figure is simply there from the first frame and is otherwise motionless: an
+        // empty page is the point, and an empty *first* frame would be a fault.
+        let num_op = 1.0 - seg(&frame, HANDOFF, 0.8);
         // The letter takes the same page position, so the two cross-dissolve in place.
         let a_op = ramp(&frame, 2.4);
 

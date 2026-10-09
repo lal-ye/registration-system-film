@@ -50,13 +50,13 @@ impl Scene for MovementTwo {
         }
 
         // Seven repetitions of one shape, ticking in on a beat. The block is centred: the
-        // longest row is 39 mono chars, so 691 is the left edge that puts its middle on the page.
+        // longest row is 38 mono chars, so 698 is the left edge that puts its middle on the page.
         let pairs_op = in_out(&frame, 2.75, 4.3, 0.5);
         if pairs_op > 0.01 {
             let mut rows: Vec<Svgr> = Vec::new();
             for (i, pair) in PAIRS.iter().enumerate() {
                 let op = ramp(&frame, 2.9 + i as f32 * 0.42) * pairs_op;
-                rows.push(fframes::svgr!(<text x="691" y={330.0 + i as f32 * 66.0} font-family={MONO_F}
+                rows.push(fframes::svgr!(<text x="698" y={330.0 + i as f32 * 66.0} font-family={MONO_F}
                     font-weight={MONO_W} font-size={MONO_MD} fill={INK} opacity={op}>{*pair}</text>));
             }
             out.push(fframes::svgr!(<g>
