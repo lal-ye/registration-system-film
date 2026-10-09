@@ -12,7 +12,7 @@ pub struct Payoff;
 
 impl Scene for Payoff {
     fn duration(&self) -> Duration<'_> {
-        Duration::Seconds(13.0)
+        Duration::Seconds(14.0)
     }
 
     fn render_frame<'a>(&'a self, frame: Frame, _ctx: &FFramesContext<'a, '_>) -> Svgr<'a> {
@@ -40,6 +40,7 @@ impl Scene for Payoff {
                              caret(&frame, 2.625, 6.0, "48"), RESULT.to_string(), result_op, press)}
             </g>
             {letter(a_op, INK)}
+            {mono_c("MVC + DAO — separation of concerns · maintainable · extensible", MONO_XS, 960.0, 920.0, ramp(&frame, 9.4), "#6d675d")}
         </g>)
     }
 }

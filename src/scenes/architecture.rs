@@ -36,6 +36,10 @@ const HOPS: [(f32, &str); 7] = [
     (200.0, "StudentDashboardFrame.repaint()"),
 ];
 
+/// Hop spacing snapped to the bed's beat grid: 4 beats at 136 BPM
+/// (4 x 0.4412 s), so every hop lands on a beat.
+const HOP: f32 = 1.7648;
+
 #[derive(Debug)]
 pub struct Architecture;
 
@@ -45,9 +49,9 @@ impl Scene for Architecture {
     }
 
     fn render_frame<'a>(&'a self, frame: Frame, _ctx: &FFramesContext<'a, '_>) -> Svgr<'a> {
-        // One hop per 2 s. `step` is the index of the hop in progress, so the band highlight
+        // One hop per 4 beats. `step` is the index of the hop in progress, so the band highlight
         // and the dot are always reading the same clock.
-        let step = ((frame.seconds() - 0.6) / 2.0).floor().max(0.0);
+        let step = ((frame.seconds() - 0.6) / HOP).floor().max(0.0);
         let mut out: Vec<Svgr> = Vec::new();
         for (i, band) in BANDS.iter().enumerate() {
             let flash = (1.0 - ((i as f32 - step) * 1.6).abs().min(1.0)) * 0.09;
@@ -72,9 +76,16 @@ impl Scene for Architecture {
         ));
 
         let idx = (step as usize).min(HOPS.len() - 1);
+        let hop_start = 0.53 + step * HOP;
+        // The last hop holds its label to the end of the scene; the others hand off.
+        let label_op = if idx == HOPS.len() - 1 {
+            ramp(&frame, hop_start)
+        } else {
+            ramp(&frame, hop_start) * (1.0 - seg(&frame, hop_start + HOP - 0.35, 0.35))
+        };
         // Decelerate into each node: constant velocity reads as a machine, and the
         // arrival is what makes the stop legible.
-        let eased = decel(&frame, 0.53 + step * 2.0, 1.5);
+        let eased = decel(&frame, 0.53 + step * HOP, 1.5);
         let (_, label) = HOPS[idx];
         let (py, _) = HOPS[idx.saturating_sub(1)];
         let y = py + (HOPS[idx].0 - py) * eased;
@@ -87,7 +98,7 @@ impl Scene for Architecture {
             <circle cx={RAIL_X} cy={y} r="15" fill={RUST} opacity={dot_op} />
             <circle cx={RAIL_X} cy={y} r="27" fill={RUST} opacity={0.16 * dot_op} />
             <text x="192" y="964" font-family={MONO_F} font-weight={MONO_W} font-size={MONO_LG}
-                  fill={INK} opacity={ramp(&frame, 0.53 + step * 2.0) * (1.0 - seg(&frame, 0.83 + step * 2.0, 0.35))}>{label}</text>
+                  fill={INK} opacity={label_op}>{label}</text>
         </g>));
         fframes::svgr!(<g>{out}</g>)
     }

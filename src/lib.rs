@@ -56,7 +56,7 @@ impl Video for RegistrationSystemFilmVideo<'_> {
     const HEIGHT: usize = HEIGHT;
     const BACKGROUND_COLOR: Color = Color::WHITE;
 
-    /// The sum of the beat durations: 4 + 2 + 2 + 2 + 12 + 13 + 15 + 14 + 14 + 13 + 5 = 96 s.
+    /// The sum of the beat durations: 4 + 2 + 2 + 2 + 12 + 11 + 15 + 14 + 14 + 14 + 6 = 96 s.
     fn duration(&self) -> Duration<'_> {
         Duration::Auto
     }

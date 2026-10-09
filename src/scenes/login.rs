@@ -12,7 +12,7 @@ pub struct Login;
 
 impl Scene for Login {
     fn duration(&self) -> Duration<'_> {
-        Duration::Seconds(13.0)
+        Duration::Seconds(11.0)
     }
 
     fn render_frame<'a>(&'a self, frame: Frame, _ctx: &FFramesContext<'a, '_>) -> Svgr<'a> {
@@ -58,7 +58,7 @@ impl Scene for Login {
             <g opacity={dash_op} transform={Transform::translate(0.0, rise(&frame, 5.15, 46.0) * (1.0 - dash_op))}>
                 {student_dashboard(enrolled, 0.35 + 0.3 * (frame.seconds() * 0.7).sin())}
             </g>
-            <rect x="440" y="762" width="1040" height="1" fill="#ddd9d0" opacity={ramp(&frame, 7.45)} />
+            <rect x="440" y="792" width="1040" height="1" fill="#ddd9d0" opacity={ramp(&frame, 7.45)} />
             {lines}
         </g>)
     }

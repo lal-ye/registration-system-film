@@ -30,13 +30,13 @@ def best(onsets):
 
 SCENES = {
     "cold_open":    [1.9],
-    "roles":        [10.0, 14.0, 18.0],
+    "roles":        [10.0, 13.9, 17.9],
     "login":        [22.7, 24.3, 26.4, 27.3, 29.6, 29.9],
-    "architecture": [35.6 + i * 2.0 for i in range(7)],
-    "movement_one": [52.75, 56.6, 60.45],
-    "movement_two": [66.9, 71.4, 74.7],
-    "payoff":       [79.2, 81.35, 82.3, 85.8, 86.6],
-    "credits":      [91.5, 93.2, 93.5],
+    "architecture": [33.6 + i * 1.7648 for i in range(7)],
+    "movement_one": [48.3, 50.9, 54.7],
+    "movement_two": [62.1, 64.7, 69.4],
+    "payoff":       [77.2, 78.6, 79.4, 80.3, 84.6],
+    "credits":      [90.6, 92.3, 92.6],
 }
 
 total_before = total_after = 0.0

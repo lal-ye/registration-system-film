@@ -17,12 +17,12 @@ pub struct Credits;
 
 impl Scene for Credits {
     fn duration(&self) -> Duration<'_> {
-        Duration::Seconds(5.0)
+        Duration::Seconds(6.0)
     }
 
     fn render_frame<'a>(&'a self, frame: Frame, _ctx: &FFramesContext<'a, '_>) -> Svgr<'a> {
         // The film ends by going quiet rather than by cutting: everything holds, then fades.
-        let fade = 1.0 - seg(&frame, 4.525, 0.6);
+        let fade = 1.0 - seg(&frame, 5.45, 0.55);
         let mut names: Vec<Svgr> = Vec::new();
         for (i, (name, id)) in TEAM.iter().enumerate() {
             let op = ramp(&frame, 0.625 + i as f32 * 0.22);

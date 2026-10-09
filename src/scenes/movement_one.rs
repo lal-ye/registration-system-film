@@ -44,7 +44,7 @@ impl Scene for MovementOne {
             out.push(fframes::svgr!(<g>
                 {lines}
                 {rule(232.0, 534.0, 1021.0 * ramp(&frame, 3.36), ramp(&frame, 3.36) * guard_op)}
-                {mono("Model/User.java", MONO_XS, 196.0, 690.0, ramp(&frame, 3.26) * guard_op, "#6d675d")}
+                {mono("Model/User.java — Encapsulation: private fields, getters, setters", MONO_XS, 196.0, 690.0, ramp(&frame, 3.26) * guard_op, "#6d675d")}
             </g>));
         }
 
@@ -69,7 +69,7 @@ impl Scene for MovementOne {
                 <rect x="1060" y="492" width="580" height="150" rx="8" fill={CARD} opacity="0.75" />
                 {mono("Instructor", MONO_LG, 1092.0, 542.0, 1.0, INK)}
                 {mono("+ deptId, boolean isHoD", MONO_MD, 1092.0, 604.0, ramp(&frame, 7.81), RUST)}
-                {mono("extends User — and declares almost nothing", MONO_XS, 960.0, 700.0, ramp(&frame, 8.11), "#6d675d")}
+                {mono_c("The User abstract class is the parent of Student and Instructor.", MONO_XS, 960.0, 700.0, ramp(&frame, 8.11), "#6d675d")}
             </g>));
         }
 

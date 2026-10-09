@@ -61,12 +61,12 @@ impl Scene for MovementTwo {
             }
             out.push(fframes::svgr!(<g>
                 {rows}
-                {mono_c("seven interfaces, seven implementations", MONO_XS, 960.0, 812.0, ramp(&frame, 5.855) * pairs_op, "#6d675d")}
+                {mono_c("seven interfaces, seven implementations · interfaces hide implementation details", MONO_XS, 960.0, 812.0, ramp(&frame, 5.855) * pairs_op, "#6d675d")}
             </g>));
         }
 
         // The crossing. A hard rule, the contract on one side, the machinery on the other.
-        let cross_op = in_out(&frame, 7.355, 2.9, 0.5);
+        let cross_op = in_out(&frame, 7.355, 3.3, 0.5);
         if cross_op > 0.01 {
             let mut l: Vec<Svgr> = Vec::new();
             let mut r: Vec<Svgr> = Vec::new();
@@ -76,11 +76,11 @@ impl Scene for MovementTwo {
                     opacity={ramp(&frame, 7.455 + i as f32 * 0.1) * cross_op}>{LEFT[i]}</text>));
                 r.push(fframes::svgr!(<text x="1000" y={290.0 + i as f32 * 46.0} font-family={MONO_F}
                     font-weight={MONO_W} font-size={MONO_MD} fill={INK}
-                    opacity={ramp(&frame, 7.755 + i as f32 * 0.1) * cross_op}>{RIGHT[i]}</text>));
+                    opacity={ramp(&frame, 7.555 + i as f32 * 0.1) * cross_op}>{RIGHT[i]}</text>));
             }
             out.push(fframes::svgr!(<g opacity={cross_op}>
-                {mono("DAO/RegistrationDAO.java", MONO_XS, 196.0, 236.0, 1.0, "#6d675d")}
-                {mono("DAO/RegistrationDAOImp.java", MONO_XS, 1000.0, 236.0, 1.0, "#6d675d")}
+                {mono("DAO/RegistrationDAO.java — interface-based polymorphism", MONO_XS, 196.0, 236.0, 1.0, "#6d675d")}
+                {mono("DAO/RegistrationDAOImp.java — method overriding", MONO_XS, 1000.0, 236.0, 1.0, "#6d675d")}
                 {l}
                 {r}
                 <rect x="958" y="212" width="3" height="300" fill={INK} opacity={ramp(&frame, 7.455)} />

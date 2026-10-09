@@ -3,10 +3,10 @@
 use crate::design::*;
 use fframes::{Duration, FFramesContext, Frame, Scene, Svgr};
 
-const ROLES: [(&str, &str); 3] = [
-    ("Student", "EnrollResult enroll(int studentId, String courseCode)"),
-    ("Instructor", "sp_updategrade(?, ?, ?)"),
-    ("Head of Department", "sp_create_course_full(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"),
+const ROLES: [(&str, &str, &str); 3] = [
+    ("Student", "EnrollResult enroll(int studentId, String courseCode)", "self-register · enroll · drop · schedule · grades"),
+    ("Instructor", "sp_updategrade(?, ?, ?)", "teaching schedule · class rosters · assessment marks"),
+    ("Head of Department", "sp_create_course_full(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", "elevated instructor · add courses · department reports"),
 ];
 
 #[derive(Debug)]
@@ -19,9 +19,9 @@ impl Scene for Roles {
 
     fn render_frame<'a>(&'a self, frame: Frame, _ctx: &FFramesContext<'a, '_>) -> Svgr<'a> {
         let mut out: Vec<Svgr> = Vec::new();
-        for (i, (role, call)) in ROLES.iter().enumerate() {
+        for (i, (role, call, desc)) in ROLES.iter().enumerate() {
             let at = (-0.09 + i as f32 * 4.0).max(0.0);
-            let op = in_out(&frame, at, 3.6, 0.45);
+            let op = in_out(&frame, at, 3.15, 0.40);
             if op <= 0.01 {
                 continue;
             }
@@ -29,6 +29,7 @@ impl Scene for Roles {
                 {statement(role, ROLE, 192.0, 468.0, 1.0, INK)}
                 {mono(call, MONO_MD, 196.0, 574.0, ramp(&frame, at + 0.9), RUST)}
                 {rule(196.0, 620.0, 96.0 * ramp(&frame, at + 0.9), ramp(&frame, at + 0.9))}
+                {mono(desc, MONO_XS, 196.0, 668.0, ramp(&frame, at + 1.1), "#6d675d")}
             </g>));
         }
         fframes::svgr!(<g>{out}</g>)
