@@ -1,47 +1,16 @@
-//! 0-4s. Chaos you can tell is code and cannot read, collapsing into one enormous letter.
-//! The letter is a mystery here; at 86s it is a repayment.
+//! 0-4s. One number on paper: 97.0, the film's real weighted total, legible and unexplained.
+//! It resolves into the enormous `A+`, which is a mystery here and a repayment at 86s.
 use crate::design::*;
 use fframes::{Duration, FFramesContext, Frame, Scene, Svgr};
 
-const FRAGMENTS: [&str; 28] = [
-    "private final int",
-    "setGender(",
-    "sp_enroll_student(?, ?)",
-    "getConnection()",
-    "implements UserDAO",
-    "SELECT * FROM registration",
-    "throw new IllegalArgumentException",
-    "public void setMaxScore(",
-    "jdbc:mysql://localhost:3306",
-    "weightedToLetter(",
-    "CallableStatement stmt =",
-    "signal sqlstate '45000'",
-    "INSERT INTO student_score",
-    "prepareCall(call)",
-    "isHeadOfDepartment(",
-    "public abstract class User",
-    "sp_get_weighted_total(?, ?)",
-    "catch (SQLException e)",
-    "return EnrollResult.SUCCESS;",
-    "private String gender;",
-    "ON DUPLICATE KEY UPDATE",
-    "sp_updategrade(?, ?, ?)",
-    "sp_create_schedule",
-    "FlatLightLaf.setup()",
-    "new UserDAOImp()",
-    "ResultSet rs = stmt.",
-    "setSectionId(int sectionId)",
-    "REGISTRATION TABLE",
-];
+/// Advance width of one character of the mono, as a fraction of the em.
+const MONO_ADV: f32 = 0.6;
+const TOTAL: &str = "97.0";
+const FIGURE: usize = 300;
 
-/// A deterministic 0..1 hash, so the chaos is identical on every frame of every run.
-fn h(n: u32) -> f32 {
-    let mut x = n.wrapping_mul(2654435761);
-    x ^= x >> 15;
-    x = x.wrapping_mul(2246822519);
-    x ^= x >> 13;
-    (x % 10_000) as f32 / 10_000.0
-}
+/// When the number starts leaving and the letter starts arriving: one cross-dissolve, so the
+/// second reads as the explanation of the first rather than a replacement for it.
+const HANDOFF: f32 = 1.9;
 
 #[derive(Debug)]
 pub struct ColdOpen;
@@ -52,35 +21,26 @@ impl Scene for ColdOpen {
     }
 
     fn render_frame<'a>(&'a self, frame: Frame, _ctx: &FFramesContext<'a, '_>) -> Svgr<'a> {
-        let mut bits: Vec<Svgr> = Vec::with_capacity(200);
-        for i in 0..196u32 {
-            let text = FRAGMENTS[(i as usize) % FRAGMENTS.len()];
-            let (a, b, c) = (h(i * 7 + 1), h(i * 7 + 2), h(i * 7 + 3));
-            // Where it starts, scattered well past the edges so the frame looks over-full.
-            let sx = -140.0 + a * 2200.0;
-            let sy = -40.0 + b * 1160.0;
-            // Where it ends: a tight column, because that is where the letter will be.
-            let ex = LETTER_X - 40.0 + c * 80.0;
-            let ey = LETTER_Y - 40.0 + h(i * 7 + 4) * 80.0;
-            // Each fragment starts drifting toward the column at its own moment.
-            let pull = frame.animate_runtime(fframes::AnimateRuntimeInput {
-                on_second: 0.3 + c * 1.3,
-                from: 0.0,
-                to: 1.0,
-                animation_runtime: &EASE,
-            });
-            let x = sx + (ex - sx) * pull;
-            let y = sy + (ey - sy) * pull;
-            let gone = scrub(&frame, 2.2 + h(i * 7 + 5) * 1.2);
-            let op = (0.14 + a * 0.16) * (1.0 - gone);
-            if op > 0.004 {
-                bits.push(fframes::svgr!(<text x={x} y={y} font-family={MONO_F} font-weight={MONO_W}
-                    font-size="13" fill={INK} opacity={op}>{text}</text>));
-            }
+        // The figure fades up quickly and is otherwise motionless: an empty frame is the point.
+        let num_op = in_out(&frame, 0.15, HANDOFF - 0.15, 0.8);
+        // The letter takes the same page position, so the two cross-dissolve in place.
+        let a_op = ramp(&frame, 2.4);
+
+        let half = TOTAL.chars().count() as f32 * MONO_ADV * FIGURE as f32 / 2.0;
+        let mut figure: Vec<Svgr> = vec![fframes::svgr!(<text x={LETTER_X} y={LETTER_Y} text-anchor="middle"
+            font-family={MONO_F} font-weight={MONO_W} font-size={FIGURE} letter-spacing="-6"
+            fill={INK}>{TOTAL}</text>)];
+        // A caret, so the number looks computed rather than printed. It blinks only while the
+        // number is still the thing on screen.
+        if frame.seconds() < HANDOFF && (frame.seconds() * 2.2).fract() < 0.55 {
+            figure.push(fframes::svgr!(<rect x={LETTER_X + half + 14.0} y={LETTER_Y - 196.0}
+                width="10" height="230" fill={INK} opacity="0.7" />));
         }
-        let a_op = ramp(&frame, 3.1);
+
         fframes::svgr!(<g>
-            {bits}
+            <g opacity={num_op}>
+                {figure}
+            </g>
             {letter(a_op, INK)}
         </g>)
     }

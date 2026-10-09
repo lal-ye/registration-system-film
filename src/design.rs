@@ -53,6 +53,9 @@ pub static SNAP: LazyLock<AnimationRuntime> =
     LazyLock::new(|| AnimationRuntime::new(0.5, &Easing::CubicBezier(0.2, 0.0, 0.0, 1.0)));
 pub static LINEAR: LazyLock<AnimationRuntime> =
     LazyLock::new(|| AnimationRuntime::new(1.0, &LINEAR_EASE));
+/// Decelerates hard and stops: the curve title work uses so arrivals settle.
+pub static DECEL: LazyLock<AnimationRuntime> =
+    LazyLock::new(|| AnimationRuntime::new(1.0, &Easing::CubicBezier(0.12, 0.0, 0.0, 1.0)));
 pub static SPRING: LazyLock<AnimationRuntime> = LazyLock::new(|| {
     AnimationRuntime::new(3.0, &Easing::Spring { mass: 1.0, stiffness: 180.0, damping: 20.0 })
 });
@@ -71,6 +74,18 @@ pub fn scrub(frame: &Frame, start: f32) -> f32 {
 /// multi-second move where the shared 1 s runtimes would be the wrong length.
 pub fn seg(frame: &Frame, start: f32, over: f32) -> f32 {
     (scrub(frame, start) / over.max(0.001)).clamp(0.0, 1.0)
+}
+
+/// 0 -> 1 across `over` seconds, arriving slowly. Anything that travels between
+/// two points and then stops should decelerate into place; at constant speed it
+/// reads as a machine, and the stop is what makes it read as an arrival.
+pub fn decel(frame: &Frame, start: f32, over: f32) -> f32 {
+    (frame.animate_runtime(AnimateRuntimeInput {
+        on_second: start,
+        from: 0.0,
+        to: 1.0,
+        animation_runtime: &DECEL,
+    }) / over.max(0.001)).clamp(0.0, 1.0)
 }
 
 /// Vertical offset that springs from `from` to 0 at `start`.
@@ -140,10 +155,29 @@ pub fn title_bar<'a>(x: f32, y: f32, w: f32, title: &'a str) -> Svgr<'a> {
     )
 }
 
+/// Widest a left-set statement may be: canvas minus the left margin it starts
+/// at, minus an equal right margin.
+pub const STMT_AVAIL: f32 = 1536.0;
+
+/// Advance width of one character of the serif, as a fraction of the em.
+/// Measured from the real font (Instrument Serif Italic, upem 1000).
+const SERIF_ADVANCE: f32 = 0.411;
+
+/// The size a statement will actually be set at: the size it wants, condensed to fit if the
+/// line would otherwise bleed off the page. Statements are one idea at one size, so a long
+/// line must shrink rather than clip.
+fn condensed(text: &str, size: usize) -> usize {
+    let chars = text.chars().filter(|c| *c != ' ').count() as f32;
+    let spaces = text.chars().filter(|c| *c == ' ').count() as f32;
+    let est = (chars * SERIF_ADVANCE + spaces * 0.22) * size as f32;
+    if est > STMT_AVAIL { (STMT_AVAIL / est * size as f32) as usize } else { size }
+}
+
 /// A statement: the voice, on paper, alone.
 pub fn statement<'a>(text: &'a str, size: usize, x: f32, y: f32, opacity: f32, fill: &'a str) -> Svgr<'a> {
+    let fitted = condensed(text, size);
     fframes::svgr!(<g opacity={opacity}>
-        <text x={x} y={y} font-family={SERIF} font-size={size} fill={fill}>{text}</text>
+        <text x={x} y={y} font-family={SERIF} font-size={fitted} fill={fill}>{text}</text>
     </g>)
 }
 
@@ -171,8 +205,9 @@ pub fn sans_c<'a>(text: &'a str, size: usize, x: f32, y: f32, opacity: f32, fill
 
 /// A statement centred on `x`.
 pub fn statement_c<'a>(text: &'a str, size: usize, x: f32, y: f32, opacity: f32, fill: &'a str) -> Svgr<'a> {
+    let fitted = condensed(text, size);
     fframes::svgr!(<g opacity={opacity}>
-        <text x={x} y={y} text-anchor="middle" font-family={SERIF} font-size={size} fill={fill}>{text}</text>
+        <text x={x} y={y} text-anchor="middle" font-family={SERIF} font-size={fitted} fill={fill}>{text}</text>
     </g>)
 }
 

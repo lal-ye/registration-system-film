@@ -43,7 +43,7 @@ impl Scene for MovementOne {
             }
             out.push(fframes::svgr!(<g>
                 {lines}
-                {rule(250.0, 452.0, 700.0 * ramp(&frame, 3.25), ramp(&frame, 3.25) * guard_op)}
+                {rule(232.0, 534.0, 1021.0 * ramp(&frame, 3.25), ramp(&frame, 3.25) * guard_op)}
                 {mono("Model/User.java", MONO_XS, 196.0, 690.0, ramp(&frame, 3.15) * guard_op, "#6d675d")}
             </g>));
         }

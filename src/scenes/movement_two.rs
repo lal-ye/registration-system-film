@@ -49,18 +49,19 @@ impl Scene for MovementTwo {
             </g>));
         }
 
-        // Seven repetitions of one shape, ticking in on a beat.
+        // Seven repetitions of one shape, ticking in on a beat. The block is centred: the
+        // longest row is 39 mono chars, so 691 is the left edge that puts its middle on the page.
         let pairs_op = in_out(&frame, 2.75, 4.3, 0.5);
         if pairs_op > 0.01 {
             let mut rows: Vec<Svgr> = Vec::new();
             for (i, pair) in PAIRS.iter().enumerate() {
                 let op = ramp(&frame, 2.9 + i as f32 * 0.42) * pairs_op;
-                rows.push(fframes::svgr!(<text x="300" y={300.0 + i as f32 * 66.0} font-family={MONO_F}
+                rows.push(fframes::svgr!(<text x="691" y={330.0 + i as f32 * 66.0} font-family={MONO_F}
                     font-weight={MONO_W} font-size={MONO_MD} fill={INK} opacity={op}>{*pair}</text>));
             }
             out.push(fframes::svgr!(<g>
                 {rows}
-                {mono("seven interfaces, seven implementations", MONO_XS, 300.0, 790.0, ramp(&frame, 5.9) * pairs_op, "#6d675d")}
+                {mono_c("seven interfaces, seven implementations", MONO_XS, 960.0, 812.0, ramp(&frame, 5.9) * pairs_op, "#6d675d")}
             </g>));
         }
 
@@ -71,10 +72,10 @@ impl Scene for MovementTwo {
             let mut r: Vec<Svgr> = Vec::new();
             for i in 0..LEFT.len() {
                 l.push(fframes::svgr!(<text x="196" y={290.0 + i as f32 * 46.0} font-family={MONO_F}
-                    font-weight={MONO_W} font-size={MONO_SM} fill={INK}
+                    font-weight={MONO_W} font-size={MONO_MD} fill={INK}
                     opacity={ramp(&frame, 7.5 + i as f32 * 0.1) * cross_op}>{LEFT[i]}</text>));
                 r.push(fframes::svgr!(<text x="1000" y={290.0 + i as f32 * 46.0} font-family={MONO_F}
-                    font-weight={MONO_W} font-size={MONO_SM} fill={INK}
+                    font-weight={MONO_W} font-size={MONO_MD} fill={INK}
                     opacity={ramp(&frame, 7.8 + i as f32 * 0.1) * cross_op}>{RIGHT[i]}</text>));
             }
             out.push(fframes::svgr!(<g opacity={cross_op}>

@@ -21,6 +21,8 @@ impl Scene for Credits {
     }
 
     fn render_frame<'a>(&'a self, frame: Frame, _ctx: &FFramesContext<'a, '_>) -> Svgr<'a> {
+        // The film ends by going quiet rather than by cutting: everything holds, then fades.
+        let fade = 1.0 - ramp(&frame, 4.1);
         let mut names: Vec<Svgr> = Vec::new();
         for (i, (name, id)) in TEAM.iter().enumerate() {
             let op = ramp(&frame, 0.5 + i as f32 * 0.22);
@@ -32,7 +34,7 @@ impl Scene for Credits {
                       fill="#8a8479">{*id}</text>
             </g>));
         }
-        fframes::svgr!(<g>
+        fframes::svgr!(<g opacity={fade}>
             {statement_c("University Registration System", TITLE, 960.0, NAME_Y, ramp(&frame, 0.1), INK)}
             {affil("ST. MARY'S UNIVERSITY  ·  DEPARTMENT OF COMPUTER SCIENCE", 20, 960.0, AFFIL_1_Y, ramp(&frame, 0.3), "#6d675d")}
             {affil("OBJECT-ORIENTED PROGRAMMING  ·  GROUP PROJECT", 20, 960.0, AFFIL_2_Y, ramp(&frame, 0.3), "#6d675d")}

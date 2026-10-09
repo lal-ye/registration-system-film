@@ -163,14 +163,16 @@ pub fn grade_entry(
     pressed: f32,
 ) -> Svgr<'static> {
     let (x, y, w, h) = (435.0_f32, 130.0_f32, 1050.0_f32, 640.0_f32);
-    let rows = ["Midterm", "Project", "Final"];
+    // Real assessment maxima from sql/seed_data.sql: Midterm 30, Project 20, Final 50.
+    let rows = [("Midterm", 30u32), ("Project", 20), ("Final", 50)];
     let mut score_fields: Vec<Svgr> = Vec::new();
-    for (i, name) in rows.iter().enumerate() {
+    for (i, (name, max)) in rows.iter().enumerate() {
         let ry = y + 250.0 + i as f32 * 62.0;
         score_fields.push(fframes::svgr!(<text x={x + 220.0} y={ry + 30.0} font-family={SANS}
             font-weight={SANS_W} font-size={UI} fill={INK}>{*name}</text>));
+        let limit = format!("/ {max}");
         score_fields.push(fframes::svgr!(<text x={x + 360.0} y={ry + 30.0} text-anchor="end"
-            font-family={MONO_F} font-weight={MONO_W} font-size={MONO_XS} fill="#6d675d">{"/ 30"}</text>));
+            font-family={MONO_F} font-weight={MONO_W} font-size={MONO_XS} fill="#6d675d">{limit}</text>));
         let value = scores[i].clone();
         score_fields.push(field(x + 400.0, ry + 4.0, 130.0, 40.0, value, 18, if i == 2 { caret } else { 0.0 }));
     }
@@ -182,9 +184,9 @@ pub fn grade_entry(
             {button(x + w - 128.0, y + 48.0, 98.0, 40.0, "Logout".to_string(), false, 0.0)}
             {tabs(x + 30.0, y + 108.0, &["My Schedule", "My Students", "Grade Entry"], &[230.0, 240.0, 230.0], 2)}
             {sans("Course:", 18, x + 40.0, y + 200.0, 1.0, INK)}
-            {combo(x + 110.0, y + 174.0, 240.0, 40.0, course)}
-            {sans("Student:", 18, x + 390.0, y + 200.0, 1.0, INK)}
-            {combo(x + 470.0, y + 174.0, 300.0, 40.0, student)}
+            {combo(x + 110.0, y + 174.0, 320.0, 40.0, course)}
+            {sans("Student:", 18, x + 455.0, y + 200.0, 1.0, INK)}
+            {combo(x + 535.0, y + 174.0, 250.0, 40.0, student)}
             {button(x + 800.0, y + 174.0, 190.0, 40.0, "Load Scores".to_string(), false, 0.0)}
             <rect x={x + 40.0} y={y + 232.0} width={w - 80.0} height="200" rx="6" fill="#f7f5f1" stroke="#e6e3dc" stroke-width="1" />
             {score_fields}

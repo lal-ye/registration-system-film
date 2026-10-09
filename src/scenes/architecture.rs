@@ -19,15 +19,21 @@ const BANDS: [Band; 4] = [
 
 const DB_Y: f32 = 832.0;
 
-/// Where the dot stands for each hop, and what that hop is called.
-const HOPS: [(f32, f32, &str); 7] = [
-    (520.0, 200.0, "LoginFrame — Enroll in Selected Course"),
-    (760.0, 370.0, "StudentDashboardController"),
-    (960.0, 545.0, "RegistrationDAO.enroll(1814, \"CS101\")"),
-    (960.0, DB_Y + 28.0, "{call sp_enroll_student(?, ?)}"),
-    (1120.0, 545.0, "EnrollResult.SUCCESS"),
-    (860.0, 725.0, "new Registration(...)"),
-    (700.0, 200.0, "StudentDashboardFrame.repaint()"),
+/// The dot runs on a rail in the right-hand gutter, clear of every band, so it
+/// never sits on top of the class name it is meant to light up. The bands run
+/// x=192..1728, so 1806 is outside all of them.
+const RAIL_X: f32 = 1806.0;
+
+/// Where the dot stands for each hop, and what that hop is called. Only the
+/// height varies: the rail is fixed, so the travel reads as "down the stack".
+const HOPS: [(f32, &str); 7] = [
+    (200.0, "LoginFrame — Enroll in Selected Course"),
+    (370.0, "StudentDashboardController"),
+    (545.0, "RegistrationDAO.enroll(1814, \"CS101\")"),
+    (DB_Y + 28.0, "{call sp_enroll_student(?, ?)}"),
+    (545.0, "EnrollResult.SUCCESS"),
+    (725.0, "new Registration(...)"),
+    (200.0, "StudentDashboardFrame.repaint()"),
 ];
 
 #[derive(Debug)]
@@ -66,18 +72,20 @@ impl Scene for Architecture {
         ));
 
         let idx = (step as usize).min(HOPS.len() - 1);
-        let eased = seg(&frame, 0.6 + step * 2.0, 1.5);
-        let (cx, cy, label) = HOPS[idx];
-        let (px, py, _) = HOPS[idx.saturating_sub(1)];
-        let x = px + (cx - px) * eased;
-        let y = py + (cy - py) * eased;
+        // Decelerate into each node: constant velocity reads as a machine, and the
+        // arrival is what makes the stop legible.
+        let eased = decel(&frame, 0.6 + step * 2.0, 1.5);
+        let (_, label) = HOPS[idx];
+        let (py, _) = HOPS[idx.saturating_sub(1)];
+        let y = py + (HOPS[idx].0 - py) * eased;
         // Hop 4 is where the work leaves Java: the dot goes dark and nothing else moves.
         let dark = if idx == 3 { seg(&frame, 4.9, 0.9) } else { 0.0 };
         let dot_op = 1.0 - dark;
 
         out.push(fframes::svgr!(<g>
-            <circle cx={x} cy={y} r="15" fill={RUST} opacity={dot_op} />
-            <circle cx={x} cy={y} r="27" fill={RUST} opacity={0.16 * dot_op} />
+            <line x1={RAIL_X} y1="130" x2={RAIL_X} y2={DB_Y + 56.0} stroke={INK} stroke-width="1" opacity="0.18" />
+            <circle cx={RAIL_X} cy={y} r="15" fill={RUST} opacity={dot_op} />
+            <circle cx={RAIL_X} cy={y} r="27" fill={RUST} opacity={0.16 * dot_op} />
             <text x="192" y="964" font-family={MONO_F} font-weight={MONO_W} font-size={MONO_LG}
                   fill={INK} opacity={ramp(&frame, 0.6 + step * 2.0) * (1.0 - seg(&frame, 0.9 + step * 2.0, 0.35))}>{label}</text>
         </g>));
