@@ -22,9 +22,10 @@ impl Scene for MovementOne {
     fn render_frame<'a>(&'a self, frame: Frame, _ctx: &FFramesContext<'a, '_>) -> Svgr<'a> {
         let mut out: Vec<Svgr> = Vec::new();
 
-        // 0-2.9s: the thesis, alone on paper. Starts at t=0 so the 48s cut from
-        // Architecture lands on content, never on blank paper.
-        let thesis_op = in_out(&frame, 0.02, 2.3, 0.5);
+        // 0-2.9s: the thesis, alone on paper. Hard-on at t=0 with no fade-in: the cut
+        // from Architecture is the entrance, so the 48s boundary frame lands on content,
+        // never on blank paper. Only the exit fades, handing off to the guard proof.
+        let thesis_op = 1.0 - ramp(&frame, 2.32);
         if thesis_op > 0.01 {
             out.push(fframes::svgr!(<g opacity={thesis_op}>
                 {statement("one fact, one place.", STATEMENT, 192.0, 540.0, 1.0, INK)}
