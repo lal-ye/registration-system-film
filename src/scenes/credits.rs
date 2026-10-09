@@ -21,8 +21,10 @@ impl Scene for Credits {
     }
 
     fn render_frame<'a>(&'a self, frame: Frame, _ctx: &FFramesContext<'a, '_>) -> Svgr<'a> {
-        // The film ends by going quiet rather than by cutting: everything holds, then fades.
-        let fade = 1.0 - seg(&frame, 5.45, 0.55);
+        // The film ends by going quiet rather than by cutting: everything holds, then dips
+        // slightly. The fade floors at 0.8 so the names are fully legible on the last frame
+        // while the bed's own fade-out supplies the sense of an ending.
+        let fade = 1.0 - 0.2 * seg(&frame, 5.45, 0.55);
         let mut names: Vec<Svgr> = Vec::new();
         for (i, (name, id)) in TEAM.iter().enumerate() {
             let op = ramp(&frame, 0.625 + i as f32 * 0.22);

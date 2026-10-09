@@ -66,7 +66,8 @@ impl Scene for MovementTwo {
         }
 
         // The crossing. A hard rule, the contract on one side, the machinery on the other.
-        let cross_op = in_out(&frame, 7.355, 3.3, 0.5);
+        // Retires fully before the landing arrives, so the statement never sits on the code.
+        let cross_op = in_out(&frame, 7.355, 2.7, 0.4);
         if cross_op > 0.01 {
             let mut l: Vec<Svgr> = Vec::new();
             let mut r: Vec<Svgr> = Vec::new();
@@ -87,8 +88,8 @@ impl Scene for MovementTwo {
             </g>));
         }
 
-        let landing_op = ramp(&frame, 10.655);
-        out.push(fframes::svgr!(<g opacity={landing_op} transform={Transform::translate(0.0, rise(&frame, 10.655, 26.0))}>
+        let landing_op = ramp(&frame, 11.35);
+        out.push(fframes::svgr!(<g opacity={landing_op} transform={Transform::translate(0.0, rise(&frame, 11.35, 26.0))}>
             {statement("same call. no idea which.", STATEMENT, 192.0, 540.0, 1.0, INK)}
         </g>));
         fframes::svgr!(<g>{out}</g>)

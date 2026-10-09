@@ -112,21 +112,22 @@ pub fn table(
 }
 
 /// `View/LoginFrame.java` at 1.6x: title, ID field, password field, error label, two buttons.
+/// The card is centred on 960 and the title is centred text, so nothing can bleed past an edge.
 pub fn login_window(typing: (String, String), caret_id: f32, caret_pw: f32, pressed: f32) -> Svgr<'static> {
-    let (x, y, w, h) = (600.0_f32, 250.0_f32, 720.0_f32, 512.0_f32);
+    let (x, y, w, h) = (540.0_f32, 250.0_f32, 840.0_f32, 520.0_f32);
     let (id_text, pw_text) = typing;
     fframes::svgr!(
         <g>
             {window_card(x, y, w, h, 1.0)}
             {title_bar(x, y, w, "University Registration System — Login")}
-            {sans("University Registration System", 26, x + w / 2.0, y + 104.0, 1.0, INK)}
-            {sans("Student / Instructor ID:", 21, x + 64.0, y + 180.0, 1.0, INK)}
-            {field(x + 380.0, y + 152.0, 276.0, 40.0, id_text, 19, caret_id)}
-            {sans("Password:", 21, x + 64.0, y + 255.0, 1.0, INK)}
-            {field(x + 380.0, y + 227.0, 276.0, 40.0, pw_text, 19, caret_pw)}
-            {sans(" ", 19, x + 64.0, y + 316.0, 1.0, INK)}
-            {button(x + 100.0, y + 346.0, 200.0, 58.0, "Login".to_string(), true, pressed)}
-            {button(x + 320.0, y + 346.0, 336.0, 58.0, "Register as Student".to_string(), false, 0.0)}
+            {sans_c("University Registration System", 26, x + w / 2.0, y + 104.0, 1.0, INK)}
+            {sans("Student / Instructor ID:", 21, x + 104.0, y + 180.0, 1.0, INK)}
+            {field(x + 420.0, y + 152.0, 276.0, 40.0, id_text, 19, caret_id)}
+            {sans("Password:", 21, x + 104.0, y + 255.0, 1.0, INK)}
+            {field(x + 420.0, y + 227.0, 276.0, 40.0, pw_text, 19, caret_pw)}
+            {sans(" ", 19, x + 104.0, y + 316.0, 1.0, INK)}
+            {button(x + 140.0, y + 346.0, 200.0, 58.0, "Login".to_string(), true, pressed)}
+            {button(x + 360.0, y + 346.0, 336.0, 58.0, "Register as Student".to_string(), false, 0.0)}
         </g>
     )
 }
