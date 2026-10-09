@@ -2,7 +2,7 @@
 //! it is a chain, and for this login the third branch was never reached.
 use crate::design::*;
 use crate::ui::*;
-use fframes::{Duration, FFramesContext, Frame, Scene, Svgr};
+use fframes::{AudioMap, AudioTimestamp::*, AudioTrack, Duration, FFramesContext, Frame, Scene, Svgr};
 
 const ID: &str = "1814";
 const MASK: &str = "••••••";
@@ -13,6 +13,20 @@ pub struct Login;
 impl Scene for Login {
     fn duration(&self) -> Duration<'_> {
         Duration::Seconds(11.0)
+    }
+
+    // Keystroke taps under the typing, a confirm beep on the button press at
+    // 4.25, a sweep as the dashboard arrives at 5.15, one soft tick as the
+    // decision strip starts at 7.75.
+    fn audio(&self) -> AudioMap<'_> {
+        AudioMap::from([
+            AudioTrack::new("click.mp3", Second(0.8)..Eof).gain_db(-22.),
+            AudioTrack::new("click.mp3", Second(1.6)..Eof).gain_db(-22.),
+            AudioTrack::new("click.mp3", Second(2.4)..Eof).gain_db(-22.),
+            AudioTrack::new("beep.mp3", Second(4.25)..Eof).gain_db(-18.),
+            AudioTrack::new("swoosh.mp3", Second(5.0)..Eof).gain_db(-16.),
+            AudioTrack::new("tick.mp3", Second(7.75)..Eof).gain_db(-22.),
+        ])
     }
 
     fn render_frame<'a>(&'a self, frame: Frame, _ctx: &FFramesContext<'a, '_>) -> Svgr<'a> {

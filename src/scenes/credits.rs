@@ -2,7 +2,7 @@
 //! time: the film decelerates into stillness.
 use crate::design::*;
 use crate::scenes::title::{AFFIL_1_Y, AFFIL_2_Y, NAME_Y};
-use fframes::{Duration, FFramesContext, Frame, Scene, Svgr};
+use fframes::{AudioMap, AudioTimestamp::*, AudioTrack, Duration, FFramesContext, Frame, Scene, Svgr};
 
 const TEAM: [(&str, &str); 5] = [
     ("Abenezer Kassahun", "RCD/1814/2017"),
@@ -18,6 +18,13 @@ pub struct Credits;
 impl Scene for Credits {
     fn duration(&self) -> Duration<'_> {
         Duration::Seconds(6.0)
+    }
+
+    // The bed is silent here too: a soft ta-da as the names start arriving.
+    fn audio(&self) -> AudioMap<'_> {
+        AudioMap::from([
+            AudioTrack::new("tada.mp3", Second(0.6)..Eof).gain_db(-12.),
+        ])
     }
 
     fn render_frame<'a>(&'a self, frame: Frame, _ctx: &FFramesContext<'a, '_>) -> Svgr<'a> {
@@ -43,7 +50,8 @@ impl Scene for Credits {
             {names}
             <rect x="712" y="606" width="496" height="1" fill="#ddd9d0" opacity={ramp(&frame, 0.625)} />
             {mono_c("Music: \"Deliberate Thought\" by Kevin MacLeod  ·  CC BY 4.0", MONO_XS, 960.0, 906.0, ramp(&frame, 2.325), "#8a8479")}
-            {mono_c("lal-ye / registration-system-film", MONO_XS, 960.0, 942.0, ramp(&frame, 2.625), "#8a8479")}
+            {mono_c("SFX: orangefreesounds.com  ·  CC BY-NC 4.0", MONO_XS, 960.0, 928.0, ramp(&frame, 2.475), "#8a8479")}
+            {mono_c("lal-ye / registration-system-film", MONO_XS, 960.0, 950.0, ramp(&frame, 2.625), "#8a8479")}
         </g>)
     }
 }

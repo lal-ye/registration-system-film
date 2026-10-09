@@ -3,7 +3,7 @@
 //! opened on, and the window recedes so the letter is the last thing standing.
 use crate::design::*;
 use crate::ui::*;
-use fframes::{Duration, FFramesContext, Frame, Scene, Svgr};
+use fframes::{AudioMap, AudioTimestamp::*, AudioTrack, Duration, FFramesContext, Frame, Scene, Svgr};
 
 const RESULT: &str = "Scores saved. Weighted total: 97.0% → Grade: A+";
 
@@ -13,6 +13,20 @@ pub struct Payoff;
 impl Scene for Payoff {
     fn duration(&self) -> Duration<'_> {
         Duration::Seconds(14.0)
+    }
+
+    // The bed is silent from here to the end of the film, so SFX carry the
+    // scene: taps under the score typing, a confirm beep on the save press at
+    // ~3.5, and the full chime as the A+ letter arrives at 8.625 (capped
+    // before the credits cut so its tail never fights the ta-da).
+    fn audio(&self) -> AudioMap<'_> {
+        AudioMap::from([
+            AudioTrack::new("click.mp3", Second(1.4)..Eof).gain_db(-22.),
+            AudioTrack::new("click.mp3", Second(2.1)..Eof).gain_db(-22.),
+            AudioTrack::new("click.mp3", Second(2.8)..Eof).gain_db(-22.),
+            AudioTrack::new("beep.mp3", Second(3.5)..Eof).gain_db(-18.),
+            AudioTrack::new("chime.mp3", Second(8.6)..Second(13.5)).gain_db(-12.),
+        ])
     }
 
     fn render_frame<'a>(&'a self, frame: Frame, _ctx: &FFramesContext<'a, '_>) -> Svgr<'a> {

@@ -1,7 +1,7 @@
 //! 8-10s. The problem the next 78 seconds answer: three roles, one set of rules, and rules need
 //! somewhere to live. The three constants are real, raised from the database.
 use crate::design::*;
-use fframes::{Duration, FFramesContext, Frame, Scene, Svgr};
+use fframes::{AudioMap, AudioTimestamp::*, AudioTrack, Duration, FFramesContext, Frame, Scene, Svgr};
 
 const RULES: [&str; 3] = ["PREREQUISITES_NOT_MET", "ROOM_CONFLICT", "INSTRUCTOR_CONFLICT"];
 
@@ -11,6 +11,13 @@ pub struct Thesis;
 impl Scene for Thesis {
     fn duration(&self) -> Duration<'_> {
         Duration::Seconds(2.0)
+    }
+
+    // A sweep that starts under the thesis and rings across the cut into Roles.
+    fn audio(&self) -> AudioMap<'_> {
+        AudioMap::from([
+            AudioTrack::new("swoosh.mp3", Second(1.7)..Eof).gain_db(-16.),
+        ])
     }
 
     fn render_frame<'a>(&'a self, frame: Frame, _ctx: &FFramesContext<'a, '_>) -> Svgr<'a> {

@@ -1,7 +1,7 @@
 //! 10-22s. Three roles, three identical frames. A name lands alone, then the one method that
 //! role exists to call. Two of the three are not Java at all.
 use crate::design::*;
-use fframes::{Duration, FFramesContext, Frame, Scene, Svgr};
+use fframes::{AudioMap, AudioTimestamp::*, AudioTrack, Duration, FFramesContext, Frame, Scene, Svgr};
 
 const ROLES: [(&str, &str, &str); 3] = [
     ("Student", "EnrollResult enroll(int studentId, String courseCode)", "self-register · enroll · drop · schedule · grades"),
@@ -15,6 +15,15 @@ pub struct Roles;
 impl Scene for Roles {
     fn duration(&self) -> Duration<'_> {
         Duration::Seconds(12.0)
+    }
+
+    // One soft tap as each role card lands (scene-relative 0.0 / 3.91 / 7.91).
+    fn audio(&self) -> AudioMap<'_> {
+        AudioMap::from([
+            AudioTrack::new("click.mp3", Second(0.0)..Eof).gain_db(-20.),
+            AudioTrack::new("click.mp3", Second(3.91)..Eof).gain_db(-20.),
+            AudioTrack::new("click.mp3", Second(7.91)..Eof).gain_db(-20.),
+        ])
     }
 
     fn render_frame<'a>(&'a self, frame: Frame, _ctx: &FFramesContext<'a, '_>) -> Svgr<'a> {

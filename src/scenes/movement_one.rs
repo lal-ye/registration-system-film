@@ -1,7 +1,7 @@
 //! 50-64s. Movement I: a fact lives in exactly one place. A rule lives in the class; a field
 //! lives in the base class. Each proof is ~4 s, the landing ~3 s.
 use crate::design::*;
-use fframes::{Duration, FFramesContext, Frame, Scene, Svgr};
+use fframes::{AudioMap, AudioTimestamp::*, AudioTrack, Duration, FFramesContext, Frame, Scene, Svgr};
 
 const GUARD: [&str; 5] = [
     "public void setGender(String gender) {",
@@ -17,6 +17,15 @@ pub struct MovementOne;
 impl Scene for MovementOne {
     fn duration(&self) -> Duration<'_> {
         Duration::Seconds(14.0)
+    }
+
+    // Bell pings (attack slices of the chime, tail cut) under the two OOP tag
+    // captions at 3.26 and 8.11.
+    fn audio(&self) -> AudioMap<'_> {
+        AudioMap::from([
+            AudioTrack::new("chime.mp3", Second(3.1)..Second(4.4)).offset(0.3).gain_db(-14.),
+            AudioTrack::new("chime.mp3", Second(7.95)..Second(9.25)).offset(0.3).gain_db(-14.),
+        ])
     }
 
     fn render_frame<'a>(&'a self, frame: Frame, _ctx: &FFramesContext<'a, '_>) -> Svgr<'a> {

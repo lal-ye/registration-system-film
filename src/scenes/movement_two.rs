@@ -1,7 +1,7 @@
 //! 64-78s. Movement II: the caller never sees the machinery. Seven pairs are visibly one rule;
 //! the crossing is the same rule in code, and it is checkable in the repo.
 use crate::design::*;
-use fframes::{Duration, FFramesContext, Frame, Scene, Svgr};
+use fframes::{AudioMap, AudioTimestamp::*, AudioTrack, Duration, FFramesContext, Frame, Scene, Svgr};
 
 const PAIRS: [&str; 7] = [
     "UserDAO          →  UserDAOImp",
@@ -37,6 +37,20 @@ pub struct MovementTwo;
 impl Scene for MovementTwo {
     fn duration(&self) -> Duration<'_> {
         Duration::Seconds(14.0)
+    }
+
+    // Tick as the pairs block starts, bell ping under the pairs caption at
+    // 5.855, sweep into the crossing at 7.355, bell ping under the landing at
+    // 11.35, and the rising whoosh (11.0-14.0) that peaks exactly on the 76s
+    // cut into Payoff — where the bed has gone silent.
+    fn audio(&self) -> AudioMap<'_> {
+        AudioMap::from([
+            AudioTrack::new("tick.mp3", Second(2.7)..Eof).gain_db(-22.),
+            AudioTrack::new("chime.mp3", Second(5.7)..Second(7.0)).offset(0.3).gain_db(-14.),
+            AudioTrack::new("swoosh.mp3", Second(7.2)..Eof).gain_db(-14.),
+            AudioTrack::new("chime.mp3", Second(11.2)..Second(12.5)).offset(0.3).gain_db(-14.),
+            AudioTrack::new("whoosh.mp3", Second(11.0)..Second(14.0)).gain_db(-10.),
+        ])
     }
 
     fn render_frame<'a>(&'a self, frame: Frame, _ctx: &FFramesContext<'a, '_>) -> Svgr<'a> {

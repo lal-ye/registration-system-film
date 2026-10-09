@@ -1,7 +1,7 @@
 //! 35-50s. The stack, drawn in our own type at full size, with one pulse of light going down it.
 //! The dot performs MVC rather than asserting it, and goes dark at the SQL boundary.
 use crate::design::*;
-use fframes::{Duration, FFramesContext, Frame, Scene, Svgr};
+use fframes::{AudioMap, AudioTimestamp::*, AudioTrack, Duration, FFramesContext, Frame, Scene, Svgr};
 
 struct Band {
     label: &'static str,
@@ -46,6 +46,21 @@ pub struct Architecture;
 impl Scene for Architecture {
     fn duration(&self) -> Duration<'_> {
         Duration::Seconds(15.0)
+    }
+
+    // One connector tick per hop label (hop starts at 0.53 + k * HOP, same
+    // clock the dot runs on), plus a sweep that carries the 48s cut.
+    fn audio(&self) -> AudioMap<'_> {
+        AudioMap::from([
+            AudioTrack::new("tick.mp3", Second(0.53)..Eof).gain_db(-20.),
+            AudioTrack::new("tick.mp3", Second(0.53 + HOP)..Eof).gain_db(-20.),
+            AudioTrack::new("tick.mp3", Second(0.53 + 2.0 * HOP)..Eof).gain_db(-20.),
+            AudioTrack::new("tick.mp3", Second(0.53 + 3.0 * HOP)..Eof).gain_db(-20.),
+            AudioTrack::new("tick.mp3", Second(0.53 + 4.0 * HOP)..Eof).gain_db(-20.),
+            AudioTrack::new("tick.mp3", Second(0.53 + 5.0 * HOP)..Eof).gain_db(-20.),
+            AudioTrack::new("tick.mp3", Second(0.53 + 6.0 * HOP)..Eof).gain_db(-20.),
+            AudioTrack::new("swoosh.mp3", Second(14.7)..Eof).gain_db(-16.),
+        ])
     }
 
     fn render_frame<'a>(&'a self, frame: Frame, _ctx: &FFramesContext<'a, '_>) -> Svgr<'a> {
