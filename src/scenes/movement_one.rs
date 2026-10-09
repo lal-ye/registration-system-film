@@ -23,7 +23,7 @@ impl Scene for MovementOne {
         let mut out: Vec<Svgr> = Vec::new();
 
         // 0-2.9s: the thesis, alone on paper.
-        let thesis_op = in_out(&frame, 0.15, 2.25, 0.5);
+        let thesis_op = in_out(&frame, 0.26, 2.25, 0.5);
         if thesis_op > 0.01 {
             out.push(fframes::svgr!(<g opacity={thesis_op}>
                 {statement("one fact, one place.", STATEMENT, 192.0, 540.0, 1.0, INK)}
@@ -31,11 +31,11 @@ impl Scene for MovementOne {
         }
 
         // 2.75-6.75s: proof. A rule that cannot be stepped over, from inside the class.
-        let guard_op = in_out(&frame, 2.75, 3.5, 0.5);
+        let guard_op = in_out(&frame, 2.86, 3.5, 0.5);
         if guard_op > 0.01 {
             let mut lines: Vec<Svgr> = Vec::new();
             for (i, line) in GUARD.iter().enumerate() {
-                let op = ramp(&frame, 2.85 + i as f32 * 0.14) * guard_op;
+                let op = ramp(&frame, 2.96 + i as f32 * 0.14) * guard_op;
                 let is_throw = i == 2;
                 lines.push(fframes::svgr!(<text x={196.0 + i as f32 * 18.0} y={430.0 + i as f32 * 44.0}
                     font-family={MONO_F} font-weight={MONO_W} font-size={MONO_MD}
@@ -43,13 +43,13 @@ impl Scene for MovementOne {
             }
             out.push(fframes::svgr!(<g>
                 {lines}
-                {rule(232.0, 534.0, 1021.0 * ramp(&frame, 3.25), ramp(&frame, 3.25) * guard_op)}
-                {mono("Model/User.java", MONO_XS, 196.0, 690.0, ramp(&frame, 3.15) * guard_op, "#6d675d")}
+                {rule(232.0, 534.0, 1021.0 * ramp(&frame, 3.36), ramp(&frame, 3.36) * guard_op)}
+                {mono("Model/User.java", MONO_XS, 196.0, 690.0, ramp(&frame, 3.26) * guard_op, "#6d675d")}
             </g>));
         }
 
         // 6.6-10.6s: proof. Inheritance made visible as absence: two nearly empty boxes.
-        let boxes_op = in_out(&frame, 6.6, 3.5, 0.5);
+        let boxes_op = in_out(&frame, 6.71, 3.5, 0.5);
         if boxes_op > 0.01 {
             let links: Vec<Svgr> = vec![
                 fframes::svgr!(<rect x="899" y="432" width="2" height="34" fill="#c9c5bc" />),
@@ -65,17 +65,17 @@ impl Scene for MovementOne {
                 {links}
                 <rect x="280" y="492" width="580" height="150" rx="8" fill={CARD} opacity="0.75" />
                 {mono("Student", MONO_LG, 312.0, 542.0, 1.0, INK)}
-                {mono("+ sectionId", MONO_MD, 312.0, 604.0, ramp(&frame, 7.4), RUST)}
+                {mono("+ sectionId", MONO_MD, 312.0, 604.0, ramp(&frame, 7.51), RUST)}
                 <rect x="1060" y="492" width="580" height="150" rx="8" fill={CARD} opacity="0.75" />
                 {mono("Instructor", MONO_LG, 1092.0, 542.0, 1.0, INK)}
-                {mono("+ deptId, boolean isHoD", MONO_MD, 1092.0, 604.0, ramp(&frame, 7.7), RUST)}
-                {mono("extends User — and declares almost nothing", MONO_XS, 960.0, 700.0, ramp(&frame, 8.0), "#6d675d")}
+                {mono("+ deptId, boolean isHoD", MONO_MD, 1092.0, 604.0, ramp(&frame, 7.81), RUST)}
+                {mono("extends User — and declares almost nothing", MONO_XS, 960.0, 700.0, ramp(&frame, 8.11), "#6d675d")}
             </g>));
         }
 
         // 10.45-14s: the landing.
-        let landing_op = ramp(&frame, 10.45);
-        out.push(fframes::svgr!(<g opacity={landing_op} transform={Transform::translate(0.0, rise(&frame, 10.45, 26.0))}>
+        let landing_op = ramp(&frame, 10.56);
+        out.push(fframes::svgr!(<g opacity={landing_op} transform={Transform::translate(0.0, rise(&frame, 10.56, 26.0))}>
             {statement("illegal states don't exist.", STATEMENT, 192.0, 540.0, 1.0, INK)}
         </g>));
         fframes::svgr!(<g>{out}</g>)

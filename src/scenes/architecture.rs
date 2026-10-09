@@ -74,12 +74,12 @@ impl Scene for Architecture {
         let idx = (step as usize).min(HOPS.len() - 1);
         // Decelerate into each node: constant velocity reads as a machine, and the
         // arrival is what makes the stop legible.
-        let eased = decel(&frame, 0.6 + step * 2.0, 1.5);
+        let eased = decel(&frame, 0.53 + step * 2.0, 1.5);
         let (_, label) = HOPS[idx];
         let (py, _) = HOPS[idx.saturating_sub(1)];
         let y = py + (HOPS[idx].0 - py) * eased;
         // Hop 4 is where the work leaves Java: the dot goes dark and nothing else moves.
-        let dark = if idx == 3 { seg(&frame, 4.9, 0.9) } else { 0.0 };
+        let dark = if idx == 3 { seg(&frame, 4.83, 0.9) } else { 0.0 };
         let dot_op = 1.0 - dark;
 
         out.push(fframes::svgr!(<g>
@@ -87,7 +87,7 @@ impl Scene for Architecture {
             <circle cx={RAIL_X} cy={y} r="15" fill={RUST} opacity={dot_op} />
             <circle cx={RAIL_X} cy={y} r="27" fill={RUST} opacity={0.16 * dot_op} />
             <text x="192" y="964" font-family={MONO_F} font-weight={MONO_W} font-size={MONO_LG}
-                  fill={INK} opacity={ramp(&frame, 0.6 + step * 2.0) * (1.0 - seg(&frame, 0.9 + step * 2.0, 0.35))}>{label}</text>
+                  fill={INK} opacity={ramp(&frame, 0.53 + step * 2.0) * (1.0 - seg(&frame, 0.83 + step * 2.0, 0.35))}>{label}</text>
         </g>));
         fframes::svgr!(<g>{out}</g>)
     }

@@ -10,7 +10,7 @@ const FIGURE: usize = 300;
 
 /// When the number starts leaving and the letter starts arriving: one cross-dissolve, so the
 /// second reads as the explanation of the first rather than a replacement for it.
-const HANDOFF: f32 = 1.9;
+const HANDOFF: f32 = 2.0;
 
 #[derive(Debug)]
 pub struct ColdOpen;

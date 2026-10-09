@@ -20,7 +20,7 @@ impl Scene for Roles {
     fn render_frame<'a>(&'a self, frame: Frame, _ctx: &FFramesContext<'a, '_>) -> Svgr<'a> {
         let mut out: Vec<Svgr> = Vec::new();
         for (i, (role, call)) in ROLES.iter().enumerate() {
-            let at = i as f32 * 4.0;
+            let at = (-0.09 + i as f32 * 4.0).max(0.0);
             let op = in_out(&frame, at, 3.6, 0.45);
             if op <= 0.01 {
                 continue;
