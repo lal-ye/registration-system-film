@@ -167,8 +167,8 @@ impl Scene for Architecture {
                         d.push_str(&format!(" L {xx:.1} {yy:.1}"));
                     }
                     out.push(fframes::svgr!(<g opacity={p}>
-                        <path d={d} stroke={RUST} stroke-width="5" stroke-linecap="round" fill="none" opacity="0.25" />
-                        <path d={d} stroke={RUST} stroke-width="2.5" stroke-linecap="round" fill="none" opacity="0.45" />
+                        <path d={d.clone()} stroke={RUST} stroke-width="5" stroke-linecap="round" fill="none" opacity="0.25" />
+                        <path d={d.clone()} stroke={RUST} stroke-width="2.5" stroke-linecap="round" fill="none" opacity="0.45" />
                         <path d={d} stroke="#d4694e" stroke-width="1" stroke-linecap="round" fill="none" opacity="0.9" />
                     </g>));
                 }
