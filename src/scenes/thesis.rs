@@ -38,20 +38,10 @@ impl Scene for Thesis {
             </g>
             {lines}
         </g>)];
-        // Exit wipe over the 10s cut: paper sweeps in from the left behind a
-        // rust edge across the last 0.3 s, handing a moving edge (not a blank
-        // frame) to Roles.
-        let wp = seg(&frame, 1.7, 0.3);
-        if wp > 0.001 {
-            let ex = wp * 1920.0;
-            let cw = 1920.0 - ex;
-            if cw > 0.5 {
-                out.push(fframes::svgr!(<g>
-                    <rect x={ex} y="0" width={cw} height="1080" fill={PAPER} />
-                    <rect x={ex} y="0" width="3" height="1080" fill={RUST} />
-                </g>));
-            }
-        }
+        // No exit wipe: the geometry as written covered the full frame at the
+        // wrong end of the sweep (a paper flash, not a wipe). The cut to Roles
+        // is carried by the swoosh cue and Roles' card 1, which is already
+        // ramping at t=0.
         fframes::svgr!(<g>{out}</g>)
     }
 }

@@ -123,14 +123,7 @@ impl Scene for MovementTwo {
         out.push(fframes::svgr!(<g opacity={landing_op} transform={Transform::translate(0.0, rise(&frame, 11.35, 26.0))}>
             {statement("same call. no idea which.", STATEMENT, 192.0, 540.0, 1.0, INK)}
         </g>));
-        // Ink flash at 12.0: a brief rust bloom as the landing settles, gone in
-        // 0.3 s. Far from the MovementTwo@8s snapshot.
-        let flash = (1.0 - ((frame.seconds() - 12.0).abs() / 0.15)).clamp(0.0, 1.0);
-        if flash > 0.01 {
-            out.push(fframes::svgr!(
-                <rect x="0" y="0" width="1920" height="1080" fill={RUST} opacity={0.28 * flash} />
-            ));
-        }
+        // No wipe or flash: the landing line and whoosh carry the settle.
         fframes::svgr!(<g>{out}</g>)
     }
 }

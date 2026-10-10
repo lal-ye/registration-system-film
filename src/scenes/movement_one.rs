@@ -106,20 +106,10 @@ impl Scene for MovementOne {
         out.push(fframes::svgr!(<g opacity={landing_op} transform={Transform::translate(0.0, rise(&frame, 10.56, 26.0))}>
             {statement("illegal states don't exist.", STATEMENT, 192.0, 540.0, 1.0, INK)}
         </g>));
-        // Entrance wipe over the 48s cut: paper sweeps in from the left behind
-        // a rust edge over the first 0.3 s. Far from the MovementOne@8s
-        // snapshot, so the approved frame is untouched.
-        let wp = seg(&frame, 0.0, 0.3);
-        if wp < 0.999 {
-            let ex = wp * 1920.0;
-            let cw = 1920.0 - ex;
-            if cw > 0.5 {
-                out.push(fframes::svgr!(<g>
-                    <rect x={ex} y="0" width={cw} height="1080" fill={PAPER} />
-                    <rect x={ex} y="0" width="3" height="1080" fill={RUST} />
-                </g>));
-            }
-        }
+        // No entrance wipe: the cut from Architecture IS the entrance. The thesis
+        // is hard-on at t=0 (see above), so the 48s boundary frame lands on
+        // content, never on blank paper. A wipe that covers anything at t=0
+        // would reintroduce the exact blank-cut bug this fixes.
         fframes::svgr!(<g>{out}</g>)
     }
 }
