@@ -63,9 +63,15 @@ impl Video for RegistrationSystemFilmVideo<'_> {
 
     // bed.mp3 is already loudness-normalised to -16 LUFS with a 2 s fade in, so no gain is
     // applied here: the template's gain_db(-16) would attenuate it a second time.
+    // The bed goes truly silent at 75.79s, so a 2-bar phrase loop (cut on the
+    // beat grid from 69.06-72.59s) crossfades in at 74.36, carries 76.2-91.85,
+    // and fades out over the credits — the last 20 s are never empty.
     fn audio(&self) -> AudioMap<'_> {
         AudioMap::from([
-            AudioTrack::new("bed.mp3", Second(0.0)..Eof).fade_out(4.0),
+            AudioTrack::new("bed.mp3", Second(0.0)..Second(76.2)).fade_out(1.8),
+            AudioTrack::new("phrase_loop.wav", Second(74.36)..Second(92.0))
+                .fade_in(1.8)
+                .fade_out(4.0),
         ])
     }
 

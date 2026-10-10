@@ -20,9 +20,12 @@ impl Scene for Roles {
     // One soft tap as each role card lands (scene-relative 0.0 / 3.91 / 7.91).
     fn audio(&self) -> AudioMap<'_> {
         AudioMap::from([
-            AudioTrack::new("click.mp3", Second(0.0)..Eof).gain_db(-20.),
-            AudioTrack::new("click.mp3", Second(3.91)..Eof).gain_db(-20.),
-            AudioTrack::new("click.mp3", Second(7.91)..Eof).gain_db(-20.),
+            AudioTrack::new("click_hit.wav", Second(0.0)..Second(0.3)).gain_db(-20.),
+            AudioTrack::new("tick_hit.wav", Second(1.1)..Second(1.35)).gain_db(-26.),
+            AudioTrack::new("click_hit.wav", Second(3.91)..Second(4.21)).gain_db(-20.),
+            AudioTrack::new("tick_hit.wav", Second(5.01)..Second(5.26)).gain_db(-26.),
+            AudioTrack::new("click_hit.wav", Second(7.91)..Second(8.21)).gain_db(-20.),
+            AudioTrack::new("tick_hit.wav", Second(9.01)..Second(9.26)).gain_db(-26.),
         ])
     }
 

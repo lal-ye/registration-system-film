@@ -1,6 +1,6 @@
 //! 6-8s. The name. The credits card at 91s is this same composition with the names added.
 use crate::design::*;
-use fframes::{Duration, FFramesContext, Frame, Scene, Svgr};
+use fframes::{AudioMap, AudioTimestamp::*, AudioTrack, Duration, FFramesContext, Frame, Scene, Svgr};
 
 /// The card's fixed geometry, shared by the title scene and the credits scene so the return
 /// lands on exactly the same page.
@@ -14,6 +14,11 @@ pub struct Title;
 impl Scene for Title {
     fn duration(&self) -> Duration<'_> {
         Duration::Seconds(2.0)
+    }
+
+    fn audio(&self) -> AudioMap<'_> {
+        // Click rides the title ramp at 0.1s.
+        AudioMap::from([AudioTrack::new("click_hit.wav", Second(0.1)..Second(0.35)).gain_db(-26.)])
     }
 
     fn render_frame<'a>(&'a self, frame: Frame, _ctx: &FFramesContext<'a, '_>) -> Svgr<'a> {

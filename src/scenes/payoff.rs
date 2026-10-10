@@ -16,16 +16,28 @@ impl Scene for Payoff {
     }
 
     // The bed is silent from here to the end of the film, so SFX carry the
-    // scene: taps under the score typing, a confirm beep on the save press at
-    // ~3.5, and the full chime as the A+ letter arrives at 8.625 (capped
-    // before the credits cut so its tail never fights the ta-da).
+    // scene: taps under the score typing (true-cps onsets), a click at the
+    // save-press peak (3.725), release (4.07), a bell CONFIRM on the result
+    // line (4.325, previously silent), a sweep as the window recedes (7.825),
+    // and the full chime as the A+ letter arrives at 8.625 (capped before
+    // the credits cut so its tail never fights the ta-da).
     fn audio(&self) -> AudioMap<'_> {
         AudioMap::from([
-            AudioTrack::new("click.mp3", Second(1.4)..Eof).gain_db(-22.),
-            AudioTrack::new("click.mp3", Second(2.1)..Eof).gain_db(-22.),
-            AudioTrack::new("click.mp3", Second(2.8)..Eof).gain_db(-22.),
-            AudioTrack::new("beep.mp3", Second(3.5)..Eof).gain_db(-18.),
-            AudioTrack::new("chime.mp3", Second(8.6)..Second(13.5)).gain_db(-12.),
+            AudioTrack::new("click_hit.wav", Second(1.39)..Second(1.64)).gain_db(-24.),
+            AudioTrack::new("click_hit.wav", Second(1.56)..Second(1.81)).gain_db(-24.),
+            AudioTrack::new("click_hit.wav", Second(2.09)..Second(2.34)).gain_db(-24.),
+            AudioTrack::new("click_hit.wav", Second(2.26)..Second(2.51)).gain_db(-24.),
+            AudioTrack::new("click_hit.wav", Second(2.79)..Second(3.04)).gain_db(-24.),
+            AudioTrack::new("click_hit.wav", Second(2.96)..Second(3.21)).gain_db(-24.),
+            AudioTrack::new("click_hit.wav", Second(3.725)..Second(3.975)).gain_db(-20.),
+            AudioTrack::new("click_hit.wav", Second(4.07)..Second(4.32)).gain_db(-24.),
+            AudioTrack::new("bell_hit.wav", Second(4.325)..Second(5.6)).gain_db(-20.),
+            AudioTrack::new("swoosh_hit.wav", Second(7.825)..Second(8.9)).gain_db(-18.),
+            AudioTrack::new("chime_hit.wav", Second(8.6)..Second(13.5))
+                .gain_db(-12.)
+                .fade_out(0.5),
+            AudioTrack::new("bell_hit.wav", Second(8.625)..Second(9.9)).gain_db(-14.),
+            AudioTrack::new("tick_hit.wav", Second(9.4)..Second(9.65)).gain_db(-26.),
         ])
     }
 

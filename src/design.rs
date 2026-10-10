@@ -244,15 +244,23 @@ pub fn letter(opacity: f32, fill: &str) -> Svgr<'_> {
     )
 }
 
-/// Reveals `text` a character at a time. `per_sec` is characters per second.
+/// Reveals `text` a character at a time. `per_sec` is characters per second, counted on the
+/// real clock: the old version multiplied through `scrub`, which saturates at 1.0 after its own
+/// 1 s runtime and so finished every string within a second regardless of `per_sec`.
 pub fn typed(frame: &Frame, start: f32, per_sec: f32, text: &str) -> String {
-    let shown = (scrub(frame, start) * per_sec * text.chars().count() as f32).floor().max(0.0);
+    let shown = ((frame.seconds() - start) * per_sec).floor().max(0.0);
     text.chars().take(shown as usize).collect()
+}
+
+/// The onset time of every character of `text`: `start + k / per_sec`. Keystroke sounds are
+/// placed on exactly these times so typing and taps share one clock.
+pub fn typed_onsets(start: f32, per_sec: f32, text: &str) -> Vec<f32> {
+    text.chars().enumerate().map(|(k, _)| start + k as f32 / per_sec).collect()
 }
 
 /// A caret that blinks while `text` is still being typed, and vanishes when it is not.
 pub fn caret(frame: &Frame, start: f32, per_sec: f32, text: &str) -> f32 {
-    let done = scrub(frame, start) * per_sec * text.chars().count() as f32;
+    let done = (frame.seconds() - start) * per_sec;
     if done >= text.chars().count() as f32 {
         0.0
     } else if (frame.seconds() * 2.2).fract() < 0.55 {
@@ -260,6 +268,27 @@ pub fn caret(frame: &Frame, start: f32, per_sec: f32, text: &str) -> f32 {
     } else {
         0.12
     }
+}
+
+/// Deterministic 64-bit hash for per-frame jitter. Frames render on several threads, so the
+/// "randomness" must be a pure function of the frame number: same frame, same sparks.
+pub fn hash(mut x: u64) -> u64 {
+    x ^= x >> 30;
+    x = x.wrapping_mul(0xbf58476d1ce4e5b9);
+    x ^= x >> 27;
+    x = x.wrapping_mul(0x94d049bb133111eb);
+    x ^= x >> 31;
+    x
+}
+
+/// The scene-relative frame number, for seeding jitter.
+pub fn fidx(frame: &Frame) -> u64 {
+    (frame.seconds() * frame.fps as f32).floor().max(0.0) as u64
+}
+
+/// One deterministic float in [0, 1) from a frame seed and a salt.
+pub fn frand(seed: u64, salt: u64) -> f32 {
+    ((hash(seed ^ salt.wrapping_mul(0x9e3779b97f4a7c15)) >> 11) as f32) / ((1u64 << 53) as f32)
 }
 
 /// A small rust hairline, the film's only marker of "this is the thing that matters".

@@ -23,7 +23,9 @@ impl Scene for Credits {
     // The bed is silent here too: a soft ta-da as the names start arriving.
     fn audio(&self) -> AudioMap<'_> {
         AudioMap::from([
-            AudioTrack::new("tada.mp3", Second(0.6)..Eof).gain_db(-12.),
+            AudioTrack::new("tada_hit.wav", Second(0.6)..Second(3.8))
+                .gain_db(-12.)
+                .fade_in(0.02),
         ])
     }
 

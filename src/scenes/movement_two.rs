@@ -39,17 +39,34 @@ impl Scene for MovementTwo {
         Duration::Seconds(14.0)
     }
 
-    // Tick as the pairs block starts, bell ping under the pairs caption at
-    // 5.855, sweep into the crossing at 7.355, bell ping under the landing at
-    // 11.35, and the rising whoosh (11.0-14.0) that peaks exactly on the 76s
-    // cut into Payoff — where the bed has gone silent.
+    // Ticks under the seven arriving pair rows (2.855 + i * 0.42), a wash +
+    // bell anchor under the pairs caption (5.855), a sweep into the crossing
+    // (7.355) with a tick on the divider (7.455), a wash + bell under the
+    // landing (11.35), and the rising whoosh (11.0-14.0, faded) that peaks
+    // exactly on the 76s cut into Payoff — where the bed has gone silent.
     fn audio(&self) -> AudioMap<'_> {
         AudioMap::from([
-            AudioTrack::new("tick.mp3", Second(2.7)..Eof).gain_db(-22.),
-            AudioTrack::new("chime.mp3", Second(5.7)..Second(7.0)).offset(0.3).gain_db(-14.),
-            AudioTrack::new("swoosh.mp3", Second(7.2)..Eof).gain_db(-14.),
-            AudioTrack::new("chime.mp3", Second(11.2)..Second(12.5)).offset(0.3).gain_db(-14.),
-            AudioTrack::new("whoosh.mp3", Second(11.0)..Second(14.0)).gain_db(-10.),
+            AudioTrack::new("click_hit.wav", Second(0.105)..Second(0.355)).gain_db(-26.),
+            AudioTrack::new("tick_hit.wav", Second(2.855)..Second(3.105)).gain_db(-24.),
+            AudioTrack::new("tick_hit.wav", Second(3.275)..Second(3.525)).gain_db(-24.),
+            AudioTrack::new("tick_hit.wav", Second(3.695)..Second(3.945)).gain_db(-24.),
+            AudioTrack::new("tick_hit.wav", Second(4.115)..Second(4.365)).gain_db(-24.),
+            AudioTrack::new("tick_hit.wav", Second(4.535)..Second(4.785)).gain_db(-24.),
+            AudioTrack::new("tick_hit.wav", Second(4.955)..Second(5.205)).gain_db(-24.),
+            AudioTrack::new("tick_hit.wav", Second(5.375)..Second(5.625)).gain_db(-24.),
+            AudioTrack::new("chime_hit.wav", Second(5.55)..Second(6.9))
+                .gain_db(-16.)
+                .fade_out(0.4),
+            AudioTrack::new("bell_hit.wav", Second(5.855)..Second(7.1)).gain_db(-20.),
+            AudioTrack::new("swoosh_hit.wav", Second(7.355)..Second(8.5)).gain_db(-18.),
+            AudioTrack::new("tick_hit.wav", Second(7.455)..Second(7.705)).gain_db(-20.),
+            AudioTrack::new("chime_hit.wav", Second(11.05)..Second(12.6))
+                .gain_db(-16.)
+                .fade_out(0.4),
+            AudioTrack::new("bell_hit.wav", Second(11.35)..Second(12.6)).gain_db(-16.),
+            AudioTrack::new("whoosh_rise.wav", Second(11.0)..Second(14.0))
+                .gain_db(-10.)
+                .fade_out(1.0),
         ])
     }
 
@@ -106,6 +123,14 @@ impl Scene for MovementTwo {
         out.push(fframes::svgr!(<g opacity={landing_op} transform={Transform::translate(0.0, rise(&frame, 11.35, 26.0))}>
             {statement("same call. no idea which.", STATEMENT, 192.0, 540.0, 1.0, INK)}
         </g>));
+        // Ink flash at 12.0: a brief rust bloom as the landing settles, gone in
+        // 0.3 s. Far from the MovementTwo@8s snapshot.
+        let flash = (1.0 - ((frame.seconds() - 12.0).abs() / 0.15)).clamp(0.0, 1.0);
+        if flash > 0.01 {
+            out.push(fframes::svgr!(
+                <rect x="0" y="0" width="1920" height="1080" fill={RUST} opacity={0.28 * flash} />
+            ));
+        }
         fframes::svgr!(<g>{out}</g>)
     }
 }

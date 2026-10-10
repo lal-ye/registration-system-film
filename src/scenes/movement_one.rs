@@ -19,12 +19,29 @@ impl Scene for MovementOne {
         Duration::Seconds(14.0)
     }
 
-    // Bell pings (attack slices of the chime, tail cut) under the two OOP tag
-    // captions at 3.26 and 8.11.
+    // Keystroke taps under the guard proof (line onsets 2.96 + i * 0.14; the
+    // throw at 3.24 gets the tick), a wash + bell anchor under each OOP tag
+    // caption (3.26, 8.11), ticks on the arriving fields (7.51, 7.81), a
+    // click as the landing statement arrives (10.56).
     fn audio(&self) -> AudioMap<'_> {
         AudioMap::from([
-            AudioTrack::new("chime.mp3", Second(3.1)..Second(4.4)).offset(0.3).gain_db(-14.),
-            AudioTrack::new("chime.mp3", Second(7.95)..Second(9.25)).offset(0.3).gain_db(-14.),
+            AudioTrack::new("click_hit.wav", Second(0.05)..Second(0.3)).gain_db(-24.),
+            AudioTrack::new("click_hit.wav", Second(2.96)..Second(3.21)).gain_db(-24.),
+            AudioTrack::new("click_hit.wav", Second(3.10)..Second(3.35)).gain_db(-24.),
+            AudioTrack::new("tick_hit.wav", Second(3.24)..Second(3.49)).gain_db(-22.),
+            AudioTrack::new("click_hit.wav", Second(3.38)..Second(3.63)).gain_db(-24.),
+            AudioTrack::new("click_hit.wav", Second(3.52)..Second(3.77)).gain_db(-24.),
+            AudioTrack::new("chime_hit.wav", Second(2.96)..Second(4.0))
+                .gain_db(-16.)
+                .fade_out(0.4),
+            AudioTrack::new("bell_hit.wav", Second(3.26)..Second(4.5)).gain_db(-20.),
+            AudioTrack::new("tick_hit.wav", Second(7.51)..Second(7.76)).gain_db(-22.),
+            AudioTrack::new("tick_hit.wav", Second(7.81)..Second(8.06)).gain_db(-22.),
+            AudioTrack::new("chime_hit.wav", Second(7.81)..Second(8.9))
+                .gain_db(-16.)
+                .fade_out(0.4),
+            AudioTrack::new("bell_hit.wav", Second(8.11)..Second(9.35)).gain_db(-20.),
+            AudioTrack::new("click_hit.wav", Second(10.56)..Second(10.81)).gain_db(-24.),
         ])
     }
 
@@ -89,6 +106,20 @@ impl Scene for MovementOne {
         out.push(fframes::svgr!(<g opacity={landing_op} transform={Transform::translate(0.0, rise(&frame, 10.56, 26.0))}>
             {statement("illegal states don't exist.", STATEMENT, 192.0, 540.0, 1.0, INK)}
         </g>));
+        // Entrance wipe over the 48s cut: paper sweeps in from the left behind
+        // a rust edge over the first 0.3 s. Far from the MovementOne@8s
+        // snapshot, so the approved frame is untouched.
+        let wp = seg(&frame, 0.0, 0.3);
+        if wp < 0.999 {
+            let ex = wp * 1920.0;
+            let cw = 1920.0 - ex;
+            if cw > 0.5 {
+                out.push(fframes::svgr!(<g>
+                    <rect x={ex} y="0" width={cw} height="1080" fill={PAPER} />
+                    <rect x={ex} y="0" width="3" height="1080" fill={RUST} />
+                </g>));
+            }
+        }
         fframes::svgr!(<g>{out}</g>)
     }
 }

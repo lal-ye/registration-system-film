@@ -15,17 +15,29 @@ impl Scene for Login {
         Duration::Seconds(11.0)
     }
 
-    // Keystroke taps under the typing, a confirm beep on the button press at
-    // 4.25, a sweep as the dashboard arrives at 5.15, one soft tick as the
-    // decision strip starts at 7.75.
+    // Keystroke taps under the typing (true-cps onsets), a click at the
+    // button-press peak (4.6), release at 5.0, confirm beep on the dashboard
+    // ramp (5.15), a sweep as it arrives, per-line ticks down the strip.
     fn audio(&self) -> AudioMap<'_> {
         AudioMap::from([
-            AudioTrack::new("click.mp3", Second(0.8)..Eof).gain_db(-22.),
-            AudioTrack::new("click.mp3", Second(1.6)..Eof).gain_db(-22.),
-            AudioTrack::new("click.mp3", Second(2.4)..Eof).gain_db(-22.),
-            AudioTrack::new("beep.mp3", Second(4.25)..Eof).gain_db(-18.),
-            AudioTrack::new("swoosh.mp3", Second(5.0)..Eof).gain_db(-16.),
-            AudioTrack::new("tick.mp3", Second(7.75)..Eof).gain_db(-22.),
+            AudioTrack::new("click_hit.wav", Second(0.75)..Second(1.0)).gain_db(-24.),
+            AudioTrack::new("click_hit.wav", Second(0.95)..Second(1.2)).gain_db(-24.),
+            AudioTrack::new("click_hit.wav", Second(1.15)..Second(1.4)).gain_db(-24.),
+            AudioTrack::new("click_hit.wav", Second(1.35)..Second(1.6)).gain_db(-24.),
+            AudioTrack::new("click_hit.wav", Second(2.29)..Second(2.54)).gain_db(-24.),
+            AudioTrack::new("click_hit.wav", Second(2.44)..Second(2.69)).gain_db(-24.),
+            AudioTrack::new("click_hit.wav", Second(2.58)..Second(2.83)).gain_db(-24.),
+            AudioTrack::new("click_hit.wav", Second(2.72)..Second(2.97)).gain_db(-24.),
+            AudioTrack::new("click_hit.wav", Second(2.87)..Second(3.12)).gain_db(-24.),
+            AudioTrack::new("click_hit.wav", Second(3.01)..Second(3.26)).gain_db(-24.),
+            AudioTrack::new("click_hit.wav", Second(4.6)..Second(4.85)).gain_db(-20.),
+            AudioTrack::new("click_hit.wav", Second(5.0)..Second(5.25)).gain_db(-24.),
+            AudioTrack::new("swoosh_hit.wav", Second(5.0)..Second(6.0)).gain_db(-16.),
+            AudioTrack::new("beep_hit.wav", Second(5.15)..Second(5.4)).gain_db(-18.),
+            AudioTrack::new("tick_hit.wav", Second(7.75)..Second(8.0)).gain_db(-22.),
+            AudioTrack::new("tick_hit.wav", Second(7.95)..Second(8.2)).gain_db(-22.),
+            AudioTrack::new("tick_hit.wav", Second(8.15)..Second(8.4)).gain_db(-28.),
+            AudioTrack::new("tick_hit.wav", Second(8.35)..Second(8.6)).gain_db(-28.),
         ])
     }
 

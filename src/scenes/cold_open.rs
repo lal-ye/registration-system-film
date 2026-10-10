@@ -1,7 +1,7 @@
 //! 0-4s. One number on paper: 97.0, the film's real weighted total, legible and unexplained.
 //! It resolves into the enormous `A+`, which is a mystery here and a repayment at 86s.
 use crate::design::*;
-use fframes::{Duration, FFramesContext, Frame, Scene, Svgr};
+use fframes::{AudioMap, AudioTimestamp::*, AudioTrack, Duration, FFramesContext, Frame, Scene, Svgr};
 
 /// Advance width of one character of the mono, as a fraction of the em.
 const MONO_ADV: f32 = 0.6;
@@ -18,6 +18,11 @@ pub struct ColdOpen;
 impl Scene for ColdOpen {
     fn duration(&self) -> Duration<'_> {
         Duration::Seconds(4.0)
+    }
+
+    fn audio(&self) -> AudioMap<'_> {
+        // Chime motif lands exactly as the A+ ramps in at 2.4s.
+        AudioMap::from([AudioTrack::new("bell_hit.wav", Second(2.4)..Second(3.8)).gain_db(-24.)])
     }
 
     fn render_frame<'a>(&'a self, frame: Frame, _ctx: &FFramesContext<'a, '_>) -> Svgr<'a> {
